@@ -264,12 +264,17 @@ export class GitService {
   }
 
   /**
-   * Get last commit message for a branch
+   * Get last commit message for a commit hash
    */
   async getLastCommitMessage(commit?: string): Promise<string> {
     try {
-      const log = await this.git.log({ maxCount: 1, from: commit });
-      return log.latest?.message || '';
+      if (!commit) {
+        const log = await this.git.log({ maxCount: 1 });
+        return log.latest?.message || '';
+      }
+      // Use git show to get specific commit message
+      const result = await this.git.show([commit, '--no-patch', '--format=%s']);
+      return result.trim();
     } catch {
       return '';
     }
