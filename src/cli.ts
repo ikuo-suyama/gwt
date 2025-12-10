@@ -38,12 +38,12 @@ program
 
 // Delete command
 program
-  .command('delete [path]')
+  .command('delete [path-or-branch]')
   .alias('rm')
-  .description('Delete a worktree')
+  .description('Delete a worktree by path or branch name')
   .option('-f, --force', 'Force deletion without confirmation')
-  .action(async (path, options) => {
-    await deleteCommand(path, options);
+  .action(async (pathOrBranch, options) => {
+    await deleteCommand(pathOrBranch, options);
   });
 
 // Switch command

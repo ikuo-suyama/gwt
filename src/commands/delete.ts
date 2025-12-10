@@ -1,4 +1,5 @@
 import inquirer from 'inquirer';
+import fs from 'fs';
 import type { DeleteOptions } from '../types/index.js';
 import { GitService } from '../lib/git.js';
 import { WorktreeManager } from '../lib/worktree.js';
@@ -9,18 +10,31 @@ import { GwtError } from '../utils/errors.js';
  * Delete command: Remove a worktree
  */
 export async function deleteCommand(
-  worktreePath: string | undefined,
+  pathOrBranch: string | undefined,
   options: DeleteOptions
 ): Promise<void> {
   try {
     const gitService = new GitService({ cwd: process.cwd() });
     const worktreeManager = new WorktreeManager(gitService);
 
-    let targetPath = worktreePath;
+    let targetPath = pathOrBranch;
     const worktrees = await worktreeManager.listWorktrees();
 
-    // Check if trying to delete main worktree
+    // Resolve path or branch name
     if (targetPath) {
+      // Check if it's a valid path
+      if (!fs.existsSync(targetPath)) {
+        // Not a path, try to find by branch name
+        const wtByBranch = worktrees.find((wt) => wt.branch === targetPath);
+        if (wtByBranch) {
+          targetPath = wtByBranch.path;
+        } else {
+          logger.error(`Worktree not found for path or branch: ${targetPath}`);
+          process.exit(1);
+        }
+      }
+
+      // Check if trying to delete main worktree
       const targetWt = worktrees.find((wt) => wt.path === targetPath);
       if (targetWt?.isMain) {
         logger.error('Cannot delete main worktree');

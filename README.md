@@ -82,14 +82,19 @@ gwt delete
 # or
 gwt rm
 
-# Delete specific worktree
+# Delete by path
 gwt delete /path/to/worktree
 
+# Delete by branch name
+gwt delete feature/auth
+
 # Force delete (skip confirmation)
-gwt delete /path/to/worktree --force
+gwt delete feature/auth --force
 # or
-gwt delete /path/to/worktree -f
+gwt delete feature/auth -f
 ```
+
+**Note**: The main worktree (original repository without suffix) cannot be deleted.
 
 ### Switch to a Worktree
 
