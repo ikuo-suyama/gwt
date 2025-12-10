@@ -30,7 +30,7 @@ program
 program
   .command('list')
   .alias('ls')
-  .description('List and manage worktrees interactively')
+  .description('List all worktrees')
   .action(async () => {
     await listCommand();
   });

@@ -1,15 +1,12 @@
-import inquirer from 'inquirer';
 import chalk from 'chalk';
 import { GitService } from '../lib/git.js';
 import { WorktreeManager } from '../lib/worktree.js';
 import { logger } from '../utils/logger.js';
 import { GwtError } from '../utils/errors.js';
-import type { WorktreeInfo, ListAction } from '../types/index.js';
-import { deleteCommand } from './delete.js';
-import { switchCommand } from './switch.js';
+import type { WorktreeInfo } from '../types/index.js';
 
 /**
- * List command: Display and manage worktrees interactively
+ * List command: Display all worktrees
  */
 export async function listCommand(): Promise<void> {
   try {
@@ -30,58 +27,6 @@ export async function listCommand(): Promise<void> {
 
     for (const wt of worktrees) {
       displayWorktree(wt);
-    }
-
-    console.log();
-
-    // Filter out current worktree for selection
-    const selectableWorktrees = worktrees.filter((wt) => !wt.isCurrent);
-
-    if (selectableWorktrees.length === 0) {
-      logger.info('No other worktrees to manage');
-      return;
-    }
-
-    // Select worktree (excluding current)
-    const { selectedWorktree } = await inquirer.prompt<{ selectedWorktree: string }>([
-      {
-        type: 'list',
-        name: 'selectedWorktree',
-        message: 'Select worktree:',
-        choices: selectableWorktrees.map((wt) => ({
-          name: formatWorktreeChoice(wt),
-          value: wt.path,
-        })),
-      },
-    ]);
-
-    // Build action choices
-    const actionChoices: Array<{ name: string; value: ListAction }> = [
-      { name: '🔄 Switch to worktree', value: 'switch' },
-      { name: '🗑️  Delete worktree', value: 'delete' },
-      { name: '❌ Cancel', value: 'cancel' },
-    ];
-
-    // Then, select action
-    const { action } = await inquirer.prompt<{ action: ListAction }>([
-      {
-        type: 'list',
-        name: 'action',
-        message: 'Select action:',
-        choices: actionChoices,
-      },
-    ]);
-
-    if (action === 'cancel') {
-      logger.info('Cancelled');
-      return;
-    }
-
-    // Execute action
-    if (action === 'switch') {
-      await switchCommand(selectedWorktree);
-    } else if (action === 'delete') {
-      await deleteCommand(selectedWorktree, { force: false });
     }
   } catch (error) {
     if (error instanceof GwtError) {
@@ -114,12 +59,4 @@ function displayWorktree(wt: WorktreeInfo): void {
     console.log(chalk.gray(`  │ ${truncated}`));
     console.log(); // Add blank line only when there's a commit message
   }
-}
-
-/**
- * Format worktree choice for inquirer
- */
-function formatWorktreeChoice(wt: WorktreeInfo): string {
-  const current = wt.isCurrent ? ' *current*' : '';
-  return `${wt.path} (${wt.branch}) [${wt.commit}]${current}`;
 }

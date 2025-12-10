@@ -58,9 +58,9 @@ gwt add feature/auth --base develop
 gwt add feature/auth --path /path/to/worktree
 ```
 
-### List and Manage Worktrees
+### List Worktrees
 
-Display all worktrees in an interactive list:
+Display all worktrees:
 
 ```bash
 gwt list
@@ -68,10 +68,7 @@ gwt list
 gwt ls
 ```
 
-The interactive list allows you to:
-- Switch to a worktree
-- Delete a worktree
-- View detailed information
+This shows all worktrees with their paths, branches, commits, and status.
 
 ### Delete a Worktree
 
