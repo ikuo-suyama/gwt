@@ -8,18 +8,11 @@ on:
   pull_request:
     branches:
       - master
-  pull_request_target:
-    branches:
-      - master
-    types:
-      - opened
-      - edited
-      - synchronize
 
 jobs:
   pr-title-check:
     name: PR Title Check
-    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Check PR title
