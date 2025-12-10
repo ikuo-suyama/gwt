@@ -110,8 +110,11 @@ gwt switch
 # or
 gwt sw
 
-# Switch to specific worktree
+# Switch to specific worktree by path
 gwt switch /path/to/worktree
+
+# Switch to worktree by branch name
+gwt switch feature/auth
 ```
 
 **Note**: For directory switching to work, add shell integration (see below).
