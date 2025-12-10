@@ -17,21 +17,29 @@ export async function deleteCommand(
     const worktreeManager = new WorktreeManager(gitService);
 
     let targetPath = worktreePath;
+    const worktrees = await worktreeManager.listWorktrees();
+
+    // Check if trying to delete main worktree
+    if (targetPath) {
+      const targetWt = worktrees.find((wt) => wt.path === targetPath);
+      if (targetWt?.isMain) {
+        logger.error('Cannot delete main worktree');
+        process.exit(1);
+      }
+    }
 
     // If no path provided, show interactive selection
     if (!targetPath) {
-      const worktrees = await worktreeManager.listWorktrees();
-
       if (worktrees.length === 0) {
         logger.warn('No worktrees found');
         return;
       }
 
-      // Filter out current worktree
-      const deletableWorktrees = worktrees.filter((wt) => !wt.isCurrent);
+      // Filter out current and main worktree
+      const deletableWorktrees = worktrees.filter((wt) => !wt.isCurrent && !wt.isMain);
 
       if (deletableWorktrees.length === 0) {
-        logger.warn('No other worktrees to delete');
+        logger.warn('No other worktrees to delete (main worktree cannot be deleted)');
         return;
       }
 

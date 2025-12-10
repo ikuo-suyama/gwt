@@ -107,6 +107,7 @@ export class GitService {
     const worktrees: WorktreeInfo[] = [];
     const lines = output.split('\n');
     let current: Partial<WorktreeInfo> = {};
+    let isFirstWorktree = true;
 
     for (const line of lines) {
       if (line.startsWith('worktree ')) {
@@ -117,7 +118,9 @@ export class GitService {
           path: line.substring('worktree '.length),
           isCurrent: false,
           isDetached: false,
+          isMain: isFirstWorktree, // First worktree is the main one
         };
+        isFirstWorktree = false;
       } else if (line.startsWith('HEAD ')) {
         current.commit = line.substring('HEAD '.length).substring(0, 7);
       } else if (line.startsWith('branch ')) {

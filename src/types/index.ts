@@ -12,6 +12,8 @@ export interface WorktreeInfo {
   isCurrent: boolean;
   /** Whether the worktree is in detached HEAD state */
   isDetached: boolean;
+  /** Whether this is the main worktree (first one, contains .git) */
+  isMain: boolean;
   /** Last commit message */
   lastCommitMessage?: string;
 }

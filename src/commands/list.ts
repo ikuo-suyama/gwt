@@ -49,8 +49,9 @@ function displayWorktree(wt: WorktreeInfo): void {
   const branch = chalk.green(`(${wt.branch})`);
   const commit = chalk.yellow(`[${wt.commit}]`);
   const current = wt.isCurrent ? chalk.bgGreen.black(' *current* ') : '';
+  const main = wt.isMain ? chalk.bgBlue.white(' *main* ') : '';
 
-  console.error(`${icon} ${path} ${branch} ${commit} ${current}`);
+  console.error(`${icon} ${path} ${branch} ${commit} ${current}${main}`);
 
   // Display commit message as sub-info with more indent
   if (wt.lastCommitMessage) {
