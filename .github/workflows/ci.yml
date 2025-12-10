@@ -34,8 +34,8 @@ jobs:
             doesn't start with an uppercase character.
           wip: false
           validateSingleCommit: false
-  lint:
-    name: Lint
+  test:
+    name: Lint, Build & Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -56,21 +56,8 @@ jobs:
       - name: Check Prettier formatting
         run: npm run format:check
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
+      - name: Build (type check)
+        run: npm run build
 
       - name: Run tests with coverage
         run: npm run test:coverage
@@ -82,29 +69,3 @@ jobs:
           flags: unittests
           name: codecov-umbrella
         continue-on-error: true
-
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    needs: [lint, test]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build
-        run: npm run build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist/
