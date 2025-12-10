@@ -2,8 +2,8 @@
 # Fish shell integration for directory switching
 
 function gwt
-    # For switch command, capture output and cd to the result
-    if test "$argv[1]" = "switch"
+    # For add and switch commands, capture output and cd to the result
+    if test "$argv[1]" = "add" -o "$argv[1]" = "switch"
         # Connect stdin and stderr to terminal for interactive prompts
         # Capture stdout (the path result)
         set -l output (command gwt $argv </dev/tty 2>/dev/tty)

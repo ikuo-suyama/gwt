@@ -2,8 +2,8 @@
 # Zsh shell integration for directory switching
 
 gwt() {
-  # For switch command, capture output and cd to the result
-  if [[ "$1" == "switch" ]]; then
+  # For add and switch commands, capture output and cd to the result
+  if [[ "$1" == "add" || "$1" == "switch" ]]; then
     local output
     # Connect stdin and stderr to terminal for interactive prompts
     # Capture stdout (the path result)

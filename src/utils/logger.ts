@@ -2,13 +2,14 @@ import chalk from 'chalk';
 
 /**
  * Logger utility with colored output
+ * All output goes to stderr to keep stdout clean for shell integration
  */
 export const logger = {
   /**
    * Log success message
    */
   success(message: string): void {
-    console.log(chalk.green('✅'), message);
+    console.error(chalk.green('✅'), message);
   },
 
   /**
@@ -22,14 +23,14 @@ export const logger = {
    * Log warning message
    */
   warn(message: string): void {
-    console.warn(chalk.yellow('⚠️'), message);
+    console.error(chalk.yellow('⚠️'), message);
   },
 
   /**
    * Log info message
    */
   info(message: string): void {
-    console.log(chalk.blue('ℹ️'), message);
+    console.error(chalk.blue('ℹ️'), message);
   },
 
   /**
@@ -37,7 +38,7 @@ export const logger = {
    */
   debug(message: string): void {
     if (process.env.DEBUG) {
-      console.log(chalk.gray('🐛'), message);
+      console.error(chalk.gray('🐛'), message);
     }
   },
 
@@ -45,27 +46,27 @@ export const logger = {
    * Log step message
    */
   step(message: string): void {
-    console.log(chalk.cyan('→'), message);
+    console.error(chalk.cyan('→'), message);
   },
 
   /**
    * Log a separator line
    */
   separator(): void {
-    console.log(chalk.gray('─'.repeat(50)));
+    console.error(chalk.gray('─'.repeat(50)));
   },
 
   /**
    * Log a highlighted message
    */
   highlight(message: string): void {
-    console.log(chalk.bgCyan.black(` ${message} `));
+    console.error(chalk.bgCyan.black(` ${message} `));
   },
 
   /**
    * Log plain message without formatting
    */
   plain(message: string): void {
-    console.log(message);
+    console.error(message);
   },
 };

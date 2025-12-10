@@ -23,7 +23,7 @@ export async function listCommand(): Promise<void> {
 
     // Display worktrees
     logger.highlight('Git Worktrees');
-    console.log();
+    console.error(); // Empty line
 
     for (const wt of worktrees) {
       displayWorktree(wt);
@@ -50,12 +50,12 @@ function displayWorktree(wt: WorktreeInfo): void {
   const commit = chalk.yellow(`[${wt.commit}]`);
   const current = wt.isCurrent ? chalk.bgGreen.black(' *current* ') : '';
 
-  console.log(`${icon} ${path} ${branch} ${commit} ${current}`);
+  console.error(`${icon} ${path} ${branch} ${commit} ${current}`);
 
   // Display commit message as sub-info with more indent
   if (wt.lastCommitMessage) {
     const message = wt.lastCommitMessage.split('\n')[0]; // First line only
     const truncated = message.length > 60 ? message.substring(0, 57) + '...' : message;
-    console.log(chalk.gray(`    │ ${truncated}`));
+    console.error(chalk.gray(`    │ ${truncated}`));
   }
 }

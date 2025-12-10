@@ -61,22 +61,23 @@ Or copy the function directly - see `zsh.sh`.
 
 The shell function intelligently wraps the `gwt` command:
 
-**For `gwt switch <path>` (with path argument):**
-1. Captures the output of the command
-2. Checks if it's a valid directory path
-3. Changes to that directory
+**For `gwt add` and `gwt switch` commands:**
+1. Connects stdin/stderr to terminal for interactive prompts
+2. Captures stdout (the worktree path)
+3. If the path is valid, automatically changes directory
 4. Displays confirmation message
 
-**For `gwt switch` (no path, interactive):**
-- Runs the command normally without capturing output
-- Allows inquirer prompts to work correctly
-- After selection, the path is output and captured
+**Technical details:**
+- All log messages go to stderr (not captured)
+- Only the final path goes to stdout (captured by shell wrapper)
+- Interactive prompts use `/dev/tty` directly
+- Works for both interactive and non-interactive usage
 
 **For all other commands:**
-- Runs normally without output capture
-- Full interactive support (prompts, colors, etc.)
+- Runs normally without modification
+- Full interactive support
 
-This allows `gwt switch` to change your shell's current directory while maintaining full support for interactive prompts.
+This allows `gwt add` and `gwt switch` to change your shell's current directory automatically.
 
 ## Reload Shell
 

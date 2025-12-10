@@ -14,7 +14,7 @@ export async function pruneCommand(): Promise<void> {
 
     if (output.trim()) {
       logger.success('Pruned worktrees:');
-      console.log(output);
+      console.error(output);
     } else {
       logger.info('No worktrees to prune');
     }

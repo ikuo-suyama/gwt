@@ -39,8 +39,9 @@ export async function addCommand(
     logger.plain(`📂 Path: ${worktreePath}`);
     logger.plain(`🌿 Branch: ${options.branchName || '(current branch)'}`);
     logger.separator();
-    logger.info('To switch to the worktree, run:');
-    logger.plain(`  cd ${worktreePath}`);
+
+    // Output path for shell integration to cd
+    console.log(worktreePath);
   } catch (error) {
     if (error instanceof GwtError) {
       logger.error(error.message);
