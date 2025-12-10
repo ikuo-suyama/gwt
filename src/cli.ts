@@ -45,11 +45,11 @@ program
 
 // Switch command
 program
-  .command('switch [path]')
+  .command('switch [path-or-branch]')
   .alias('sw')
-  .description('Switch to a worktree')
-  .action(async (path) => {
-    await switchCommand(path);
+  .description('Switch to a worktree by path or branch name')
+  .action(async (pathOrBranch) => {
+    await switchCommand(pathOrBranch);
   });
 
 // Prune command
