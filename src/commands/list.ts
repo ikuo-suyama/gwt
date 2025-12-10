@@ -34,7 +34,28 @@ export async function listCommand(): Promise<void> {
 
     console.log();
 
-    // Interactive action selection
+    // First, select worktree
+    const { selectedWorktree } = await inquirer.prompt<{ selectedWorktree: string }>([
+      {
+        type: 'list',
+        name: 'selectedWorktree',
+        message: 'Select worktree:',
+        choices: [
+          ...worktrees.map((wt) => ({
+            name: formatWorktreeChoice(wt),
+            value: wt.path,
+          })),
+          { name: chalk.gray('❌ Cancel'), value: '__cancel__' },
+        ],
+      },
+    ]);
+
+    if (selectedWorktree === '__cancel__') {
+      logger.info('Cancelled');
+      return;
+    }
+
+    // Then, select action for that worktree
     const { action } = await inquirer.prompt<{ action: ListAction }>([
       {
         type: 'list',
@@ -52,19 +73,6 @@ export async function listCommand(): Promise<void> {
       logger.info('Cancelled');
       return;
     }
-
-    // Select worktree for action
-    const { selectedWorktree } = await inquirer.prompt<{ selectedWorktree: string }>([
-      {
-        type: 'list',
-        name: 'selectedWorktree',
-        message: 'Select worktree:',
-        choices: worktrees.map((wt) => ({
-          name: formatWorktreeChoice(wt),
-          value: wt.path,
-        })),
-      },
-    ]);
 
     // Execute action
     if (action === 'switch') {
