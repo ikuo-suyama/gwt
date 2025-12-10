@@ -17,7 +17,6 @@ export default defineConfig({
         '**/__tests__/**',
         'src/cli.ts',
         'src/index.ts',
-        'src/commands/**',
       ],
       thresholds: {
         lines: 80,
