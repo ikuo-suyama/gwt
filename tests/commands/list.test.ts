@@ -97,9 +97,9 @@ describe('listCommand', () => {
       await listCommand();
 
       // Check that console.error was called with strings containing worktree info
-      const allCalls = consoleErrorSpy.mock.calls.map((call) => call[0]);
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
       const hasCurrentMarker = allCalls.some(
-        (call) => typeof call === 'string' && call.includes('/path/to/main')
+        (call: unknown) => typeof call === 'string' && call.includes('/path/to/main')
       );
 
       expect(hasCurrentMarker).toBe(true);
@@ -110,9 +110,9 @@ describe('listCommand', () => {
 
       await listCommand();
 
-      const allCalls = consoleErrorSpy.mock.calls.map((call) => call[0]);
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
       const hasMainBadge = allCalls.some(
-        (call) => typeof call === 'string' && call.includes('/path/to/main')
+        (call: unknown) => typeof call === 'string' && call.includes('/path/to/main')
       );
 
       expect(hasMainBadge).toBe(true);
@@ -123,9 +123,9 @@ describe('listCommand', () => {
 
       await listCommand();
 
-      const allCalls = consoleErrorSpy.mock.calls.map((call) => call[0]);
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
       const hasPrunableWarning = allCalls.some(
-        (call) => typeof call === 'string' && call.includes('prune')
+        (call: unknown) => typeof call === 'string' && call.includes('prune')
       );
 
       expect(hasPrunableWarning).toBe(true);
@@ -136,9 +136,9 @@ describe('listCommand', () => {
 
       await listCommand();
 
-      const allCalls = consoleErrorSpy.mock.calls.map((call) => call[0]);
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
       const hasCommitMessage = allCalls.some(
-        (call) =>
+        (call: unknown) =>
           typeof call === 'string' &&
           (call.includes('Initial commit') ||
             call.includes('Add new feature') ||
@@ -166,9 +166,9 @@ describe('listCommand', () => {
 
       await listCommand();
 
-      const allCalls = consoleErrorSpy.mock.calls.map((call) => call[0]);
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
       const hasTruncatedMessage = allCalls.some(
-        (call) => typeof call === 'string' && call.includes('...')
+        (call: unknown) => typeof call === 'string' && call.includes('...')
       );
 
       expect(hasTruncatedMessage).toBe(true);
