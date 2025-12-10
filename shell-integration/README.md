@@ -59,13 +59,24 @@ Or copy the function directly - see `zsh.sh`.
 
 ## How It Works
 
-The shell function wraps the `gwt` command and:
-1. Captures the output of the command
-2. Checks if it's a `switch` command that succeeded
-3. If the output is a valid directory path, changes to that directory
-4. Otherwise, displays the output normally
+The shell function intelligently wraps the `gwt` command:
 
-This allows `gwt switch` to actually change your shell's current directory, which a standalone binary cannot do.
+**For `gwt switch <path>` (with path argument):**
+1. Captures the output of the command
+2. Checks if it's a valid directory path
+3. Changes to that directory
+4. Displays confirmation message
+
+**For `gwt switch` (no path, interactive):**
+- Runs the command normally without capturing output
+- Allows inquirer prompts to work correctly
+- After selection, the path is output and captured
+
+**For all other commands:**
+- Runs normally without output capture
+- Full interactive support (prompts, colors, etc.)
+
+This allows `gwt switch` to change your shell's current directory while maintaining full support for interactive prompts.
 
 ## Reload Shell
 

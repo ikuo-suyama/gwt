@@ -2,16 +2,23 @@
 # Fish shell integration for directory switching
 
 function gwt
-    set -l output (command gwt $argv)
-    set -l exit_code $status
+    # For switch command, capture output and cd to the result
+    if test "$argv[1]" = "switch"
+        # Connect stdin to terminal for interactive prompts
+        set -l output (command gwt $argv </dev/tty)
+        set -l exit_code $status
 
-    if test $exit_code -eq 0 -a "$argv[1]" = "switch" -a -d "$output"
-        cd "$output"
-        or return 1
-        echo "Switched to: $output"
+        if test $exit_code -eq 0 -a -d "$output"
+            cd "$output"
+            or return 1
+            echo "Switched to: $output"
+        else
+            echo "$output"
+        end
+
+        return $exit_code
     else
-        echo "$output"
+        # Run normally for other commands
+        command gwt $argv
     end
-
-    return $exit_code
 end
