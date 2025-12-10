@@ -3,7 +3,7 @@
 
 gwt() {
   # For add and switch commands, capture output and cd to the result
-  if [[ "$1" == "add" || "$1" == "switch" ]]; then
+  if [[ "$1" == "add" || "$1" == "switch" || "$1" == "sw" ]]; then
     local output
     # Connect stdin and stderr to terminal for interactive prompts
     # Capture stdout (the path result)
