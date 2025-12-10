@@ -123,10 +123,30 @@ gwt sync --base develop
 
 ### Cleanup Worktrees
 
-Remove references to deleted worktrees:
+Clean up Git's internal references when worktree directories were manually deleted:
 
 ```bash
 gwt prune
+```
+
+**When to use**: Only needed if you deleted worktree directories manually (e.g., `rm -rf`, file manager, etc.). If you use `gwt delete`, cleanup is automatic.
+
+**Example scenario**:
+```bash
+# Manually delete a worktree directory
+rm -rf ../gwtree-feature
+
+# Git still thinks it exists
+git worktree list
+# → /path/to/gwtree-feature (feature) [abc123] prunable
+
+# Clean up the reference
+gwt prune
+# → Cleaned up references for deleted worktrees
+
+# Now it's gone from the list
+git worktree list
+# → Only remaining worktrees
 ```
 
 ## Shell Integration

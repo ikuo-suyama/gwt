@@ -7,16 +7,17 @@ import { GwtError } from '../utils/errors.js';
  */
 export async function pruneCommand(): Promise<void> {
   try {
-    logger.step('Pruning worktrees...');
+    logger.step('Checking for manually deleted worktrees...');
 
     const gitService = new GitService({ cwd: process.cwd() });
     const output = await gitService.pruneWorktrees();
 
     if (output.trim()) {
-      logger.success('Pruned worktrees:');
+      logger.success('Cleaned up references for deleted worktrees:');
       console.error(output);
     } else {
-      logger.info('No worktrees to prune');
+      logger.success('All worktrees are in sync');
+      logger.info('No cleanup needed (prune only removes references to manually deleted worktrees)');
     }
   } catch (error) {
     if (error instanceof GwtError) {

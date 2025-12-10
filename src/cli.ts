@@ -58,7 +58,7 @@ program
 // Prune command
 program
   .command('prune')
-  .description('Clean up removed worktrees')
+  .description('Clean up Git references for manually deleted worktrees (only needed if deleted outside gwt)')
   .action(async () => {
     await pruneCommand();
   });
