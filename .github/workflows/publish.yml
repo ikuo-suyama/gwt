@@ -40,8 +40,10 @@ jobs:
           npm pack --dry-run
           echo "Package contents verified"
 
-      - name: Publish to NPM (Trusted Publishing)
+      - name: Publish to NPM
         run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
       - name: Report Success
         if: success()
