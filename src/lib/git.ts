@@ -119,6 +119,7 @@ export class GitService {
           isCurrent: false,
           isDetached: false,
           isMain: isFirstWorktree, // First worktree is the main one
+          isPrunable: false,
         };
         isFirstWorktree = false;
       } else if (line.startsWith('HEAD ')) {
@@ -128,6 +129,8 @@ export class GitService {
       } else if (line === 'detached') {
         current.isDetached = true;
         current.branch = 'HEAD';
+      } else if (line.startsWith('prunable')) {
+        current.isPrunable = true;
       } else if (line === '') {
         if (current.path) {
           worktrees.push(current as WorktreeInfo);

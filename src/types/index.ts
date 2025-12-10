@@ -14,6 +14,8 @@ export interface WorktreeInfo {
   isDetached: boolean;
   /** Whether this is the main worktree (first one, contains .git) */
   isMain: boolean;
+  /** Whether the worktree can be pruned (directory deleted manually) */
+  isPrunable: boolean;
   /** Last commit message */
   lastCommitMessage?: string;
 }

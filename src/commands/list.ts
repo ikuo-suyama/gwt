@@ -50,13 +50,19 @@ function displayWorktree(wt: WorktreeInfo): void {
   const commit = chalk.yellow(`[${wt.commit}]`);
   const current = wt.isCurrent ? chalk.bgGreen.black(' *current* ') : '';
   const main = wt.isMain ? chalk.bgBlue.white(' *main* ') : '';
+  const prunable = wt.isPrunable ? chalk.bgRed.white(' *prunable* ') : '';
 
-  console.error(`${icon} ${path} ${branch} ${commit} ${current}${main}`);
+  console.error(`${icon} ${path} ${branch} ${commit} ${current}${main}${prunable}`);
 
   // Display commit message as sub-info with more indent
   if (wt.lastCommitMessage) {
     const message = wt.lastCommitMessage.split('\n')[0]; // First line only
     const truncated = message.length > 60 ? message.substring(0, 57) + '...' : message;
     console.error(chalk.gray(`    │ ${truncated}`));
+  }
+
+  // Display prunable hint
+  if (wt.isPrunable) {
+    console.error(chalk.red(`    │ Directory deleted manually. Run 'gwt prune' to clean up.`));
   }
 }
