@@ -135,19 +135,31 @@ describe('switchCommand', () => {
   });
 
   describe('with path specified', () => {
-    it('should switch to worktree by existing path', async () => {
-      // Mock fs.existsSync to return true (valid path)
-      vi.mocked(fs.existsSync).mockReturnValue(true);
+    it('should switch to worktree by existing worktree path', async () => {
+      vi.spyOn(mockWorktreeManager, 'listWorktrees').mockResolvedValue(mockWorktrees);
       vi.mocked(GitService).mockImplementation(() => mockGitService);
       vi.mocked(WorktreeManager).mockImplementation(() => mockWorktreeManager);
 
       const testPath = '/test/project-feature-auth';
       await switchCommand(testPath);
 
+      expect(mockWorktreeManager.listWorktrees).toHaveBeenCalled();
+      expect(consoleLogSpy).toHaveBeenCalledWith(testPath);
+    });
+
+    it('should switch to worktree by absolute directory path', async () => {
+      vi.spyOn(mockWorktreeManager, 'listWorktrees').mockResolvedValue(mockWorktrees);
+      vi.mocked(fs.existsSync).mockReturnValue(true);
+      vi.mocked(fs.statSync).mockReturnValue({ isDirectory: () => true } as any);
+      vi.mocked(GitService).mockImplementation(() => mockGitService);
+      vi.mocked(WorktreeManager).mockImplementation(() => mockWorktreeManager);
+
+      const testPath = '/some/absolute/path';
+      await switchCommand(testPath);
+
+      expect(mockWorktreeManager.listWorktrees).toHaveBeenCalled();
       expect(fs.existsSync).toHaveBeenCalledWith(testPath);
       expect(consoleLogSpy).toHaveBeenCalledWith(testPath);
-      // listWorktrees should not be called when path exists
-      expect(mockWorktreeManager.listWorktrees).not.toHaveBeenCalled();
     });
   });
 
