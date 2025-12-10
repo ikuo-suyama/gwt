@@ -204,10 +204,7 @@ export class GitService {
       return output;
     } catch (error) {
       if (error instanceof Error) {
-        throw new GitError(
-          `Failed to prune worktrees: ${error.message}`,
-          'git worktree prune -v'
-        );
+        throw new GitError(`Failed to prune worktrees: ${error.message}`, 'git worktree prune -v');
       }
       throw error;
     }
