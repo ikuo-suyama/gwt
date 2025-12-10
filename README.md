@@ -132,26 +132,25 @@ Shell integration scripts are provided in the [`shell-integration/`](shell-integ
 - **Bash**: [`shell-integration/bash.sh`](shell-integration/bash.sh)
 - **Zsh**: [`shell-integration/zsh.sh`](shell-integration/zsh.sh)
 
-### Installation
+### Quick Install
 
-Add to your shell configuration file:
-
-```bash
-# Fish (~/.config/fish/config.fish)
-source /path/to/gwtree/shell-integration/fish.fish
-
-# Bash (~/.bashrc)
-source /path/to/gwtree/shell-integration/bash.sh
-
-# Zsh (~/.zshrc)
-source /path/to/gwtree/shell-integration/zsh.sh
+**Fish (Recommended: use conf.d to keep config.fish clean)**
+```fish
+# Copy to conf.d directory (auto-loaded by Fish)
+cp shell-integration/fish.fish ~/.config/fish/conf.d/gwt.fish
+exec $SHELL -l
 ```
 
-Then reload your shell or run:
+**Bash**
 ```bash
-source ~/.config/fish/config.fish  # Fish
-source ~/.bashrc                   # Bash
-source ~/.zshrc                    # Zsh
+echo "source $(pwd)/shell-integration/bash.sh" >> ~/.bashrc
+exec $SHELL -l
+```
+
+**Zsh**
+```zsh
+echo "source $(pwd)/shell-integration/zsh.sh" >> ~/.zshrc
+exec $SHELL -l
 ```
 
 See [`shell-integration/README.md`](shell-integration/README.md) for more details.

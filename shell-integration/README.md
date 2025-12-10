@@ -6,29 +6,29 @@ These shell integration scripts enable `gwt switch` to actually change your curr
 
 ### Fish Shell
 
+**Recommended: Install to conf.d (keeps config.fish clean)**
+
+```fish
+# If installed via npm globally
+set -l gwt_path (npm root -g)/gwt/shell-integration/fish.fish
+cp "$gwt_path" ~/.config/fish/conf.d/gwt.fish
+
+# Or from local repository
+cp shell-integration/fish.fish ~/.config/fish/conf.d/gwt.fish
+
+# Or create a symlink (auto-updates with package)
+ln -s "$(pwd)/shell-integration/fish.fish" ~/.config/fish/conf.d/gwt.fish
+
+# Reload shell
+exec $SHELL -l
+```
+
+**Alternative: Source in config.fish**
+
 Add to your `~/.config/fish/config.fish`:
 
 ```fish
 source /path/to/gwtree/shell-integration/fish.fish
-```
-
-Or copy the function directly:
-
-```fish
-function gwt
-    set -l output (command gwt $argv)
-    set -l exit_code $status
-
-    if test $exit_code -eq 0 -a "$argv[1]" = "switch" -a -d "$output"
-        cd "$output"
-        or return 1
-        echo "Switched to: $output"
-    else
-        echo "$output"
-    end
-
-    return $exit_code
-end
 ```
 
 ### Bash
@@ -37,6 +37,9 @@ Add to your `~/.bashrc`:
 
 ```bash
 source /path/to/gwtree/shell-integration/bash.sh
+
+# Reload shell
+exec $SHELL -l
 ```
 
 Or copy the function directly - see `bash.sh`.
@@ -47,6 +50,9 @@ Add to your `~/.zshrc`:
 
 ```zsh
 source /path/to/gwtree/shell-integration/zsh.sh
+
+# Reload shell
+exec $SHELL -l
 ```
 
 Or copy the function directly - see `zsh.sh`.
@@ -61,8 +67,12 @@ The shell function wraps the `gwt` command and:
 
 This allows `gwt switch` to actually change your shell's current directory, which a standalone binary cannot do.
 
-## Note
+## Reload Shell
 
-After sourcing the integration script, you may need to:
-- Restart your shell, or
-- Run `source ~/.config/fish/config.fish` (or equivalent for your shell)
+After installation, reload your shell:
+
+```bash
+exec $SHELL -l
+```
+
+This works for Fish, Bash, and Zsh.
