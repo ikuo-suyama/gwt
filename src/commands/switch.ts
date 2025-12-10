@@ -8,6 +8,7 @@ import fs from 'fs';
 
 /**
  * Switch command: Switch to a different worktree
+ * @param worktreePath - Path to worktree or branch name
  */
 export async function switchCommand(worktreePath: string | undefined): Promise<void> {
   try {
@@ -16,7 +17,7 @@ export async function switchCommand(worktreePath: string | undefined): Promise<v
 
     let targetPath = worktreePath;
 
-    // If no path provided, show interactive selection
+    // If no path/branch provided, show interactive selection
     if (!targetPath) {
       const worktrees = await worktreeManager.listWorktrees();
 
@@ -56,6 +57,36 @@ export async function switchCommand(worktreePath: string | undefined): Promise<v
       output.destroy();
 
       targetPath = selected;
+    } else {
+      // Check if the input is a path or branch name
+      // First, get all worktrees
+      const worktrees = await worktreeManager.listWorktrees();
+
+      // Check if input matches a worktree path
+      const matchingWorktreeByPath = worktrees.find((wt) => wt.path === targetPath);
+
+      if (matchingWorktreeByPath) {
+        // Input is a valid worktree path
+        targetPath = matchingWorktreeByPath.path;
+      } else {
+        // Check if it's an existing directory path
+        const isAbsolutePath = targetPath.startsWith('/');
+        const pathExists =
+          isAbsolutePath && fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory();
+
+        if (!pathExists) {
+          // Treat as branch name and search for matching worktree
+          const matchingWorktree = worktrees.find((wt) => wt.branch === targetPath);
+
+          if (!matchingWorktree) {
+            logger.error(`No worktree found for branch: ${targetPath}`);
+            process.exit(1);
+          }
+
+          targetPath = matchingWorktree.path;
+          logger.info(`Found worktree for branch '${matchingWorktree.branch}': ${targetPath}`);
+        }
+      }
     }
 
     // Output the path for shell integration to use

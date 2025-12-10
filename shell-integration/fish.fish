@@ -3,7 +3,7 @@
 
 function gwt
     # For add and switch commands, capture output and cd to the result
-    if test "$argv[1]" = "add" -o "$argv[1]" = "switch"
+    if test "$argv[1]" = "add" -o "$argv[1]" = "switch" -o "$argv[1]" = "sw"
         # Connect stdin and stderr to terminal for interactive prompts
         # Capture stdout (the path result)
         set -l output (command gwt $argv </dev/tty 2>/dev/tty)
