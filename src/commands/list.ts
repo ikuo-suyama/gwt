@@ -52,11 +52,10 @@ function displayWorktree(wt: WorktreeInfo): void {
 
   console.log(`${icon} ${path} ${branch} ${commit} ${current}`);
 
-  // Display commit message as sub-info
+  // Display commit message as sub-info with more indent
   if (wt.lastCommitMessage) {
     const message = wt.lastCommitMessage.split('\n')[0]; // First line only
     const truncated = message.length > 60 ? message.substring(0, 57) + '...' : message;
-    console.log(chalk.gray(`  │ ${truncated}`));
-    console.log(); // Add blank line only when there's a commit message
+    console.log(chalk.gray(`    │ ${truncated}`));
   }
 }
