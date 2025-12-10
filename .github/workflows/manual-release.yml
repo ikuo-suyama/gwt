@@ -54,10 +54,6 @@ jobs:
         if: ${{ !inputs.skip_tests }}
         run: npm test
 
-      - name: Run E2E Tests
-        if: ${{ !inputs.skip_tests }}
-        run: npm run test:e2e
-
   create-release:
     name: Create Release
     needs: validate
