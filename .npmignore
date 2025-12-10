@@ -1,0 +1,29 @@
+# Source files
+src/
+tests/
+*.test.ts
+*.spec.ts
+
+# Config files
+tsconfig.json
+vitest*.config.ts
+.eslintrc.js
+.prettierrc
+
+# CI/CD
+.github/
+.git/
+.gitignore
+
+# Development
+node_modules/
+.DS_Store
+*.log
+*.tgz
+
+# Documentation (keep README, LICENSE)
+docs/
+
+# Release automation
+release-please-config.json
+.release-please-manifest.json

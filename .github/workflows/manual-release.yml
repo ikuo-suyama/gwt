@@ -1,0 +1,106 @@
+name: Manual Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type (leave empty for automatic detection)'
+        required: false
+        type: choice
+        options:
+          - ''
+          - major
+          - minor
+          - patch
+      skip_tests:
+        description: 'Skip tests (for emergency releases only)'
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  validate:
+    name: Validation & Testing
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linter
+        run: npm run lint
+
+      - name: Run Prettier Check
+        run: npm run format:check
+
+      - name: Run TypeScript Build
+        run: npm run build
+
+      - name: Run Unit Tests
+        if: ${{ !inputs.skip_tests }}
+        run: npm test
+
+      - name: Run E2E Tests
+        if: ${{ !inputs.skip_tests }}
+        run: npm run test:e2e
+
+  create-release:
+    name: Create Release
+    needs: validate
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Manual Version Override
+        if: inputs.version_type != ''
+        run: |
+          echo "RELEASE_AS=${{ inputs.version_type }}" >> $GITHUB_ENV
+
+      - name: Release Please
+        id: release
+        uses: googleapis/release-please-action@v4
+        with:
+          release-type: node
+          package-name: '@ikuo-suyama/gwt'
+          prerelease: false
+          changelog-types: '[
+            {"type":"feat","section":"Features","hidden":false},
+            {"type":"fix","section":"Bug Fixes","hidden":false},
+            {"type":"perf","section":"Performance","hidden":false},
+            {"type":"docs","section":"Documentation","hidden":false},
+            {"type":"refactor","section":"Refactoring","hidden":false},
+            {"type":"style","section":"Code Style","hidden":false},
+            {"type":"test","section":"Tests","hidden":false},
+            {"type":"build","section":"Build System","hidden":false},
+            {"type":"ci","section":"CI/CD","hidden":false},
+            {"type":"chore","section":"Miscellaneous","hidden":false}
+          ]'
+          release-as: ${{ env.RELEASE_AS }}
+
+      - name: Trigger Publish
+        if: steps.release.outputs.release_created
+        uses: peter-evans/repository-dispatch@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          event-type: publish-npm
+          client-payload: '{"tag": "${{ steps.release.outputs.tag_name }}"}'

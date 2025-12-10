@@ -1,0 +1,53 @@
+name: Publish to NPM
+
+on:
+  repository_dispatch:
+    types: [publish-npm]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Git tag to publish (e.g., v1.2.3)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write  # For provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Release Tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.tag || inputs.tag }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          registry-url: 'https://registry.npmjs.org'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify Package Contents
+        run: |
+          npm pack --dry-run
+          echo "Package contents verified"
+
+      - name: Publish to NPM
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Report Success
+        if: success()
+        run: |
+          echo "Successfully published @ikuo-suyama/gwt@$(node -p "require('./package.json').version")"
+          echo "View at: https://www.npmjs.com/package/@ikuo-suyama/gwt"
