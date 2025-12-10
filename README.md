@@ -58,6 +58,8 @@ gwt add feature/auth --base develop
 gwt add feature/auth --path /path/to/worktree
 ```
 
+**Note**: You must use the `add` subcommand explicitly. Running `gwt` without a subcommand shows help.
+
 ### List Worktrees
 
 Display all worktrees:

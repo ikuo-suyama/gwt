@@ -15,9 +15,10 @@ program
   .description('Git worktree management CLI')
   .version('1.0.0');
 
-// Default command: add
+// Add command
 program
-  .argument('[branch-name]', 'Branch name for worktree (uses current branch if omitted)')
+  .command('add [branch-name]')
+  .description('Create a new worktree')
   .option('--no-rebase', 'Skip automatic rebase')
   .option('--no-env', 'Skip .env file copying')
   .option('--base <branch>', 'Override base branch')
@@ -70,5 +71,10 @@ program
   .action(async (options) => {
     await syncCommand(options);
   });
+
+// Show help if no subcommand provided
+if (process.argv.length === 2) {
+  program.help();
+}
 
 program.parse(process.argv);
