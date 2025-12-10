@@ -2,6 +2,7 @@
   "name": "gwt",
   "version": "1.0.0",
   "description": "Git worktree management CLI",
+  "type": "module",
   "keywords": [
     "git",
     "worktree",
@@ -13,12 +14,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/gwt.git"
+    "url": "https://github.com/ikuo-suyama/gwtree.git"
   },
   "bugs": {
-    "url": "https://github.com/your-username/gwt/issues"
+    "url": "https://github.com/ikuo-suyama/gwtree/issues"
   },
-  "homepage": "https://github.com/your-username/gwt#readme",
+  "homepage": "https://github.com/ikuo-suyama/gwtree#readme",
   "bin": {
     "gwt": "./dist/cli.js"
   },

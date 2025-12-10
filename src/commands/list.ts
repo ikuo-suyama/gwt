@@ -34,51 +34,60 @@ export async function listCommand(): Promise<void> {
 
     console.log();
 
-    // First, select worktree
-    const { selectedWorktree } = await inquirer.prompt<{ selectedWorktree: string }>([
-      {
-        type: 'list',
-        name: 'selectedWorktree',
-        message: 'Select worktree:',
-        choices: [
-          ...worktrees.map((wt) => ({
-            name: formatWorktreeChoice(wt),
-            value: wt.path,
-          })),
-          { name: chalk.gray('❌ Cancel'), value: '__cancel__' },
-        ],
-      },
-    ]);
+    // Build choices with actions for each worktree
+    const choices: Array<{ name: string; value: string }> = [];
 
-    if (selectedWorktree === '__cancel__') {
-      logger.info('Cancelled');
+    for (const wt of worktrees) {
+      // Skip current worktree (can't switch to or delete current)
+      if (wt.isCurrent) {
+        continue;
+      }
+
+      const wtInfo = `${chalk.cyan(wt.path)} ${chalk.green(`(${wt.branch})`)} ${chalk.yellow(
+        `[${wt.commit}]`
+      )}`;
+
+      choices.push({
+        name: `  🔄 Switch to: ${wtInfo}`,
+        value: `switch:${wt.path}`,
+      });
+      choices.push({
+        name: `  🗑️  Delete:    ${wtInfo}`,
+        value: `delete:${wt.path}`,
+      });
+    }
+
+    if (choices.length === 0) {
+      logger.info('No other worktrees to manage');
       return;
     }
 
-    // Then, select action for that worktree
-    const { action } = await inquirer.prompt<{ action: ListAction }>([
+    choices.push({ name: chalk.gray('\n❌ Cancel'), value: 'cancel' });
+
+    // Select action and worktree in one step
+    const { selection } = await inquirer.prompt<{ selection: string }>([
       {
         type: 'list',
-        name: 'action',
+        name: 'selection',
         message: 'Select action:',
-        choices: [
-          { name: '🔄 Switch to worktree', value: 'switch' },
-          { name: '🗑️  Delete worktree', value: 'delete' },
-          { name: '❌ Cancel', value: 'cancel' },
-        ],
+        choices,
+        pageSize: 15,
       },
     ]);
 
-    if (action === 'cancel') {
+    if (selection === 'cancel') {
       logger.info('Cancelled');
       return;
     }
+
+    // Parse selection
+    const [action, worktreePath] = selection.split(':');
 
     // Execute action
     if (action === 'switch') {
-      await switchCommand(selectedWorktree);
+      await switchCommand(worktreePath);
     } else if (action === 'delete') {
-      await deleteCommand(selectedWorktree, { force: false });
+      await deleteCommand(worktreePath, { force: false });
     }
   } catch (error) {
     if (error instanceof GwtError) {
