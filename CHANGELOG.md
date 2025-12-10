@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/ikuo-suyama/gwt/compare/v1.1.0...v1.2.0) (2025-12-10)
+
+
+### Features
+
+* add branch name support to switch command ([#8](https://github.com/ikuo-suyama/gwt/issues/8)) ([2deeba7](https://github.com/ikuo-suyama/gwt/commit/2deeba70df83467747fcf02b814dc59e00e26224))
+
+
+### Bug Fixes
+
+* remove registry-url to enable Trusted Publishing OIDC auth ([5e94992](https://github.com/ikuo-suyama/gwt/commit/5e949923154c63ffcbd2507acbc34737855ed2d8))
+
 ## [1.1.0](https://github.com/ikuo-suyama/gwt/compare/v1.0.0...v1.1.0) (2025-12-10)
 
 
