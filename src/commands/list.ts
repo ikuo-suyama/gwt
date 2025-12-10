@@ -34,36 +34,33 @@ export async function listCommand(): Promise<void> {
 
     console.log();
 
-    // First, select worktree (including current)
+    // Filter out current worktree for selection
+    const selectableWorktrees = worktrees.filter((wt) => !wt.isCurrent);
+
+    if (selectableWorktrees.length === 0) {
+      logger.info('No other worktrees to manage');
+      return;
+    }
+
+    // Select worktree (excluding current)
     const { selectedWorktree } = await inquirer.prompt<{ selectedWorktree: string }>([
       {
         type: 'list',
         name: 'selectedWorktree',
         message: 'Select worktree:',
-        choices: worktrees.map((wt) => ({
+        choices: selectableWorktrees.map((wt) => ({
           name: formatWorktreeChoice(wt),
           value: wt.path,
         })),
       },
     ]);
 
-    // Find the selected worktree info
-    const selectedWt = worktrees.find((wt) => wt.path === selectedWorktree);
-
-    if (!selectedWt) {
-      logger.error('Selected worktree not found');
-      return;
-    }
-
-    // Build action choices based on whether it's current worktree
-    const actionChoices: Array<{ name: string; value: ListAction }> = [];
-
-    if (!selectedWt.isCurrent) {
-      actionChoices.push({ name: '🔄 Switch to worktree', value: 'switch' });
-      actionChoices.push({ name: '🗑️  Delete worktree', value: 'delete' });
-    }
-
-    actionChoices.push({ name: '❌ Cancel', value: 'cancel' });
+    // Build action choices
+    const actionChoices: Array<{ name: string; value: ListAction }> = [
+      { name: '🔄 Switch to worktree', value: 'switch' },
+      { name: '🗑️  Delete worktree', value: 'delete' },
+      { name: '❌ Cancel', value: 'cancel' },
+    ];
 
     // Then, select action
     const { action } = await inquirer.prompt<{ action: ListAction }>([
@@ -115,9 +112,8 @@ function displayWorktree(wt: WorktreeInfo): void {
     const message = wt.lastCommitMessage.split('\n')[0]; // First line only
     const truncated = message.length > 60 ? message.substring(0, 57) + '...' : message;
     console.log(chalk.gray(`  │ ${truncated}`));
+    console.log(); // Add blank line only when there's a commit message
   }
-
-  console.log();
 }
 
 /**
