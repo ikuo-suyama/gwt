@@ -3,6 +3,7 @@ import { GitService } from '../lib/git.js';
 import { WorktreeManager } from '../lib/worktree.js';
 import { logger } from '../utils/logger.js';
 import { GwtError } from '../utils/errors.js';
+import tty from 'tty';
 
 /**
  * Switch command: Switch to a different worktree
@@ -31,7 +32,13 @@ export async function switchCommand(worktreePath: string | undefined): Promise<v
         return;
       }
 
-      const { selected } = await inquirer.prompt<{ selected: string }>([
+      // Create inquirer instance with /dev/tty for shell integration
+      const input = new tty.ReadStream(require('fs').openSync('/dev/tty', 'r'));
+      const output = new tty.WriteStream(require('fs').openSync('/dev/tty', 'w'));
+
+      const customPrompt = inquirer.createPromptModule({ input, output });
+
+      const { selected } = await customPrompt<{ selected: string }>([
         {
           type: 'list',
           name: 'selected',
@@ -42,6 +49,10 @@ export async function switchCommand(worktreePath: string | undefined): Promise<v
           })),
         },
       ]);
+
+      // Close streams
+      input.destroy();
+      output.destroy();
 
       targetPath = selected;
     }
