@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/ikuo-suyama/gwt/compare/v1.2.0...v1.2.1) (2025-12-10)
+
+
+### Bug Fixes
+
+* exclude tests from TypeScript compilation ([#13](https://github.com/ikuo-suyama/gwt/issues/13)) ([73e842c](https://github.com/ikuo-suyama/gwt/commit/73e842c73fa5605b63d97a84d8fe561b7bd25781))
+
 ## [1.2.0](https://github.com/ikuo-suyama/gwt/compare/v1.1.0...v1.2.0) (2025-12-10)
 
 
