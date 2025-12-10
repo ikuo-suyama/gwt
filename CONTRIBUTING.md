@@ -215,8 +215,17 @@ chore: Update dependencies to latest versions
    ```
 
 6. **Create a Pull Request**
-   - Provide a clear title and description
-   - Reference any related issues
+   - **PR Title**: Follow Conventional Commits format (same as commit messages)
+     ```
+     feat: Add support for custom worktree paths
+     fix: Resolve issue with detached HEAD detection
+     ```
+   - **PR Description**: Include clear explanation of changes
+     - What problem does this solve?
+     - What changes were made?
+     - How to test?
+     - Any breaking changes?
+   - Reference any related issues (e.g., `Closes #123`)
    - Ensure all CI checks pass
    - Wait for review
 
@@ -230,6 +239,8 @@ chore: Update dependencies to latest versions
 - [ ] Build succeeds (`npm run build`)
 - [ ] Documentation updated (if needed)
 - [ ] Commit messages follow conventional commits
+- [ ] **PR title follows conventional commits format**
+- [ ] **PR description is clear and complete**
 - [ ] CI checks pass
 
 ## Reporting Issues
