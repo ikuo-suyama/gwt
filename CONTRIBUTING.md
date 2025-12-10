@@ -170,17 +170,17 @@ We follow [Conventional Commits](https://www.conventionalcommits.org/) specifica
 ### Examples
 
 ```bash
-feat: Add support for custom worktree paths
+feat: add support for custom worktree paths
 
-fix: Resolve issue with detached HEAD detection
+fix: resolve issue with detached HEAD detection
 
-docs: Update installation instructions
+docs: update installation instructions
 
-test: Add unit tests for git service
+test: add unit tests for git service
 
-refactor: Simplify worktree path computation
+refactor: simplify worktree path computation
 
-chore: Update dependencies to latest versions
+chore: update dependencies to latest versions
 ```
 
 ## Pull Request Process
@@ -205,7 +205,7 @@ chore: Update dependencies to latest versions
 4. **Commit your changes**
    ```bash
    git add .
-   git commit -m "feat: Add your feature"
+   git commit -m "feat: add your feature"
    ```
    Pre-commit hooks will automatically run linting and formatting.
 
@@ -215,8 +215,17 @@ chore: Update dependencies to latest versions
    ```
 
 6. **Create a Pull Request**
-   - Provide a clear title and description
-   - Reference any related issues
+   - **PR Title**: Follow Conventional Commits format (same as commit messages)
+     ```
+     feat: add support for custom worktree paths
+     fix: resolve issue with detached HEAD detection
+     ```
+   - **PR Description**: Include clear explanation of changes
+     - What problem does this solve?
+     - What changes were made?
+     - How to test?
+     - Any breaking changes?
+   - Reference any related issues (e.g., `Closes #123`)
    - Ensure all CI checks pass
    - Wait for review
 
@@ -230,6 +239,8 @@ chore: Update dependencies to latest versions
 - [ ] Build succeeds (`npm run build`)
 - [ ] Documentation updated (if needed)
 - [ ] Commit messages follow conventional commits
+- [ ] **PR title follows conventional commits format**
+- [ ] **PR description is clear and complete**
 - [ ] CI checks pass
 
 ## Reporting Issues

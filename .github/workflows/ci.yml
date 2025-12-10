@@ -3,13 +3,48 @@ name: CI
 on:
   push:
     branches:
-      - main
+      - master
       - feature/**
   pull_request:
     branches:
-      - main
+      - master
+  pull_request_target:
+    branches:
+      - master
+    types:
+      - opened
+      - edited
+      - synchronize
 
 jobs:
+  pr-title-check:
+    name: PR Title Check
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PR title
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            test
+            refactor
+            style
+            chore
+            perf
+            ci
+          requireScope: false
+          subjectPattern: ^(?![A-Z]).+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            doesn't start with an uppercase character.
+          wip: false
+          validateSingleCommit: false
   lint:
     name: Lint
     runs-on: ubuntu-latest
