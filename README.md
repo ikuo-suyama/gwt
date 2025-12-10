@@ -124,66 +124,37 @@ gwt prune
 
 ## Shell Integration
 
-For `gwt switch` to actually change your current directory, add this to your shell configuration:
+For `gwt switch` to actually change your current directory, you need to add a shell function wrapper.
 
-### Bash (~/.bashrc)
+Shell integration scripts are provided in the [`shell-integration/`](shell-integration/) directory:
+
+- **Fish**: [`shell-integration/fish.fish`](shell-integration/fish.fish)
+- **Bash**: [`shell-integration/bash.sh`](shell-integration/bash.sh)
+- **Zsh**: [`shell-integration/zsh.sh`](shell-integration/zsh.sh)
+
+### Installation
+
+Add to your shell configuration file:
 
 ```bash
-gwt() {
-  local output
-  output=$(command gwt "$@")
-  local exit_code=$?
+# Fish (~/.config/fish/config.fish)
+source /path/to/gwtree/shell-integration/fish.fish
 
-  # Check if output is a directory path (for switch command)
-  if [[ $exit_code -eq 0 && "$1" == "switch" && -d "$output" ]]; then
-    cd "$output" || return 1
-    echo "Switched to: $output"
-  else
-    echo "$output"
-  fi
+# Bash (~/.bashrc)
+source /path/to/gwtree/shell-integration/bash.sh
 
-  return $exit_code
-}
+# Zsh (~/.zshrc)
+source /path/to/gwtree/shell-integration/zsh.sh
 ```
 
-### Zsh (~/.zshrc)
-
-```zsh
-gwt() {
-  local output
-  output=$(command gwt "$@")
-  local exit_code=$?
-
-  # Check if output is a directory path (for switch command)
-  if [[ $exit_code -eq 0 && "$1" == "switch" && -d "$output" ]]; then
-    cd "$output" || return 1
-    echo "Switched to: $output"
-  else
-    echo "$output"
-  fi
-
-  return $exit_code
-}
+Then reload your shell or run:
+```bash
+source ~/.config/fish/config.fish  # Fish
+source ~/.bashrc                   # Bash
+source ~/.zshrc                    # Zsh
 ```
 
-### Fish (~/.config/fish/config.fish)
-
-```fish
-function gwt
-    set -l output (command gwt $argv)
-    set -l exit_code $status
-
-    if test $exit_code -eq 0 -a "$argv[1]" = "switch" -a -d "$output"
-        cd "$output"
-        or return 1
-        echo "Switched to: $output"
-    else
-        echo "$output"
-    end
-
-    return $exit_code
-end
-```
+See [`shell-integration/README.md`](shell-integration/README.md) for more details.
 
 ## How It Works
 
