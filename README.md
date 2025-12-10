@@ -269,7 +269,7 @@ We welcome contributions! Please follow these guidelines:
 1. Fork the repository
 2. Clone your fork:
    ```bash
-   git clone https://github.com/your-username/gwt.git
+   git clone https://github.com/ikuo-suyama/gwt.git
    cd gwt
    ```
 3. Install dependencies:
@@ -385,9 +385,9 @@ Originally inspired by the Fish shell `gwtree` function.
 
 ## Support
 
-- 🐛 [Report bugs](https://github.com/your-username/gwt/issues)
-- 💡 [Request features](https://github.com/your-username/gwt/issues)
-- 📖 [Read the docs](https://github.com/your-username/gwt)
+- 🐛 [Report bugs](https://github.com/ikuo-suyama/gwt/issues)
+- 💡 [Request features](https://github.com/ikuo-suyama/gwt/issues)
+- 📖 [Read the docs](https://github.com/ikuo-suyama/gwt)
 
 ---
 
