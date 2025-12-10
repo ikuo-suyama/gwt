@@ -17,7 +17,9 @@ export async function pruneCommand(): Promise<void> {
       console.error(output);
     } else {
       logger.success('All worktrees are in sync');
-      logger.info('No cleanup needed (prune only removes references to manually deleted worktrees)');
+      logger.info(
+        'No cleanup needed (prune only removes references to manually deleted worktrees)'
+      );
     }
   } catch (error) {
     if (error instanceof GwtError) {

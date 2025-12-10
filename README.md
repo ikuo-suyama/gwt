@@ -1,5 +1,11 @@
 # gwt - Git Worktree Manager
 
+[![CI](https://github.com/ikuo-suyama/gwt/workflows/CI/badge.svg)](https://github.com/ikuo-suyama/gwt/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/ikuo-suyama/gwt/branch/master/graph/badge.svg)](https://codecov.io/gh/ikuo-suyama/gwt)
+[![npm version](https://img.shields.io/npm/v/gwt.svg)](https://www.npmjs.com/package/gwt)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js Version](https://img.shields.io/node/v/gwt.svg)](https://nodejs.org)
+
 A powerful CLI tool for managing Git worktrees with ease. Simplify your multi-branch workflow with intuitive commands and interactive interfaces.
 
 ## Features
@@ -288,113 +294,26 @@ gwt prune
 
 ## Contributing
 
-We welcome contributions! Please follow these guidelines:
+We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines on:
 
-### Getting Started
+- Development workflow and testing
+- Code quality standards and CI checks
+- Commit message conventions
+- Pull request process
+- Issue reporting guidelines
 
-1. Fork the repository
-2. Clone your fork:
-   ```bash
-   git clone https://github.com/ikuo-suyama/gwt.git
-   cd gwt
-   ```
-3. Install dependencies:
-   ```bash
-   npm install
-   ```
-4. Create a feature branch:
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-### Development
-
+**Quick Start**:
 ```bash
-# Run in development mode
-npm run dev
-
-# Run tests
-npm test
-
-# Run tests in watch mode
-npm run test:watch
-
-# Run linter
-npm run lint
-
-# Format code
-npm run format
-
-# Build for production
-npm run build
+git clone https://github.com/YOUR_USERNAME/gwt.git
+cd gwt
+npm install
+npm test  # Ensure all tests pass
 ```
 
-### Testing
-
-We maintain high test coverage. Please ensure:
-
-- All new features have unit tests
-- Integration tests cover command interactions
-- E2E tests verify CLI behavior
-
-```bash
-# Run all tests
-npm test
-
-# Run specific test file
-npm test -- git.test.ts
-
-# Run tests with coverage
-npm run test:coverage
-```
-
-### Code Style
-
-We use ESLint and Prettier for code quality:
-
-```bash
-# Check linting
-npm run lint
-
-# Fix linting issues
-npm run lint:fix
-
-# Format code
-npm run format
-```
-
-### Commit Guidelines
-
-Follow conventional commits:
-
-```
-feat: Add new feature
-fix: Fix bug
-docs: Update documentation
-test: Add tests
-refactor: Refactor code
-chore: Update dependencies
-```
-
-### Pull Request Process
-
-1. Update documentation for any new features
-2. Add tests for new functionality
-3. Ensure all tests pass: `npm test`
-4. Ensure linting passes: `npm run lint`
-5. Update CHANGELOG.md with your changes
-6. Submit PR with clear description of changes
-
-### Reporting Issues
-
-When reporting issues, please include:
-
-- Operating system and version
-- Node.js version
-- `gwt` version
-- Steps to reproduce
-- Expected vs actual behavior
-- Relevant error messages or logs
+**Before submitting a PR**, make sure:
+- ✅ All tests pass with ≥80% coverage
+- ✅ Linting and formatting checks pass
+- ✅ CI checks are green
 
 ## Requirements
 
@@ -408,6 +327,16 @@ MIT License - see [LICENSE.md](LICENSE.md) for details
 ## Credits
 
 Originally inspired by the Fish shell `gwtree` function.
+
+## Contributors
+
+Thanks to all the people who have contributed to this project!
+
+<a href="https://github.com/ikuo-suyama/gwt/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=ikuo-suyama/gwt" />
+</a>
+
+Made with [contrib.rocks](https://contrib.rocks).
 
 ## Support
 

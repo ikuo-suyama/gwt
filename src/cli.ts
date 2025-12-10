@@ -10,10 +10,7 @@ import { syncCommand } from './commands/sync.js';
 
 const program = new Command();
 
-program
-  .name('gwt')
-  .description('Git worktree management CLI')
-  .version('1.0.0');
+program.name('gwt').description('Git worktree management CLI').version('1.0.0');
 
 // Add command
 program
@@ -58,7 +55,9 @@ program
 // Prune command
 program
   .command('prune')
-  .description('Clean up Git references for manually deleted worktrees (only needed if deleted outside gwt)')
+  .description(
+    'Clean up Git references for manually deleted worktrees (only needed if deleted outside gwt)'
+  )
   .action(async () => {
     await pruneCommand();
   });
