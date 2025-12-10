@@ -71,7 +71,8 @@ export async function switchCommand(worktreePath: string | undefined): Promise<v
       } else {
         // Check if it's an existing directory path
         const isAbsolutePath = targetPath.startsWith('/');
-        const pathExists = isAbsolutePath && fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory();
+        const pathExists =
+          isAbsolutePath && fs.existsSync(targetPath) && fs.statSync(targetPath).isDirectory();
 
         if (!pathExists) {
           // Treat as branch name and search for matching worktree
