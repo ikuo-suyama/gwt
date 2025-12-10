@@ -34,60 +34,57 @@ export async function listCommand(): Promise<void> {
 
     console.log();
 
-    // Build choices with actions for each worktree
-    const choices: Array<{ name: string; value: string }> = [];
-
-    for (const wt of worktrees) {
-      // Skip current worktree (can't switch to or delete current)
-      if (wt.isCurrent) {
-        continue;
-      }
-
-      const wtInfo = `${chalk.cyan(wt.path)} ${chalk.green(`(${wt.branch})`)} ${chalk.yellow(
-        `[${wt.commit}]`
-      )}`;
-
-      choices.push({
-        name: `  🔄 Switch to: ${wtInfo}`,
-        value: `switch:${wt.path}`,
-      });
-      choices.push({
-        name: `  🗑️  Delete:    ${wtInfo}`,
-        value: `delete:${wt.path}`,
-      });
-    }
-
-    if (choices.length === 0) {
-      logger.info('No other worktrees to manage');
-      return;
-    }
-
-    choices.push({ name: chalk.gray('\n❌ Cancel'), value: 'cancel' });
-
-    // Select action and worktree in one step
-    const { selection } = await inquirer.prompt<{ selection: string }>([
+    // First, select worktree (including current)
+    const { selectedWorktree } = await inquirer.prompt<{ selectedWorktree: string }>([
       {
         type: 'list',
-        name: 'selection',
-        message: 'Select action:',
-        choices,
-        pageSize: 15,
+        name: 'selectedWorktree',
+        message: 'Select worktree:',
+        choices: worktrees.map((wt) => ({
+          name: formatWorktreeChoice(wt),
+          value: wt.path,
+        })),
       },
     ]);
 
-    if (selection === 'cancel') {
+    // Find the selected worktree info
+    const selectedWt = worktrees.find((wt) => wt.path === selectedWorktree);
+
+    if (!selectedWt) {
+      logger.error('Selected worktree not found');
+      return;
+    }
+
+    // Build action choices based on whether it's current worktree
+    const actionChoices: Array<{ name: string; value: ListAction }> = [];
+
+    if (!selectedWt.isCurrent) {
+      actionChoices.push({ name: '🔄 Switch to worktree', value: 'switch' });
+      actionChoices.push({ name: '🗑️  Delete worktree', value: 'delete' });
+    }
+
+    actionChoices.push({ name: '❌ Cancel', value: 'cancel' });
+
+    // Then, select action
+    const { action } = await inquirer.prompt<{ action: ListAction }>([
+      {
+        type: 'list',
+        name: 'action',
+        message: 'Select action:',
+        choices: actionChoices,
+      },
+    ]);
+
+    if (action === 'cancel') {
       logger.info('Cancelled');
       return;
     }
 
-    // Parse selection
-    const [action, worktreePath] = selection.split(':');
-
     // Execute action
     if (action === 'switch') {
-      await switchCommand(worktreePath);
+      await switchCommand(selectedWorktree);
     } else if (action === 'delete') {
-      await deleteCommand(worktreePath, { force: false });
+      await deleteCommand(selectedWorktree, { force: false });
     }
   } catch (error) {
     if (error instanceof GwtError) {
