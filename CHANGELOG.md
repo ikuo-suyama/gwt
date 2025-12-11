@@ -1,5 +1,26 @@
 # Changelog
 
+## [2.0.0](https://github.com/ikuo-suyama/gwt/compare/v1.2.1...v2.0.0) (2025-12-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* Drop Node.js 18 support. Minimum required version is now Node.js 20.
+
+### Features
+
+* add one-line shell integration installer ([#18](https://github.com/ikuo-suyama/gwt/issues/18)) ([51112cc](https://github.com/ikuo-suyama/gwt/commit/51112ccbaac93d21a677dba88b6fd77447398165))
+
+
+### Bug Fixes
+
+* read version dynamically from package.json ([#15](https://github.com/ikuo-suyama/gwt/issues/15)) ([1bb73f7](https://github.com/ikuo-suyama/gwt/commit/1bb73f7592f575a09f379b1091cb79e4f6c31c02))
+
+
+### Continuous Integration
+
+* upgrade to Node.js 20 and update npm for OIDC publishing ([#16](https://github.com/ikuo-suyama/gwt/issues/16)) ([53fae20](https://github.com/ikuo-suyama/gwt/commit/53fae2049de370b0cd624978a0c5806492124ce5))
+
 ## [1.2.1](https://github.com/ikuo-suyama/gwt/compare/v1.2.0...v1.2.1) (2025-12-10)
 
 
