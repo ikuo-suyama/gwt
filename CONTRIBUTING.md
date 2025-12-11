@@ -298,6 +298,11 @@ gwt/
 │   ├── lib/
 │   └── utils/
 ├── shell-integration/      # Shell wrapper scripts
+│   ├── install.sh         # Automatic installer
+│   ├── bash.sh            # Bash integration
+│   ├── fish.fish          # Fish integration
+│   ├── zsh.sh             # Zsh integration
+│   └── README.md          # Integration documentation
 ├── .github/
 │   └── workflows/
 │       └── ci.yml         # CI/CD pipeline
