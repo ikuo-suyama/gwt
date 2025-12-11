@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
 import { Command } from 'commander';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
 import { addCommand } from './commands/add.js';
 import { listCommand } from './commands/list.js';
 import { deleteCommand } from './commands/delete.js';
@@ -8,9 +11,13 @@ import { switchCommand } from './commands/switch.js';
 import { pruneCommand } from './commands/prune.js';
 import { syncCommand } from './commands/sync.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+const packageJson = JSON.parse(readFileSync(join(__dirname, '../package.json'), 'utf-8'));
+
 const program = new Command();
 
-program.name('gwt').description('Git worktree management CLI').version('1.0.0');
+program.name('gwt').description('Git worktree management CLI').version(packageJson.version);
 
 // Add command
 program
