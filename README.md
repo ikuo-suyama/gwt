@@ -2,9 +2,9 @@
 
 [![CI](https://github.com/ikuo-suyama/gwt/workflows/CI/badge.svg)](https://github.com/ikuo-suyama/gwt/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/ikuo-suyama/gwt/branch/master/graph/badge.svg)](https://codecov.io/gh/ikuo-suyama/gwt)
-[![npm version](https://img.shields.io/npm/v/gwt.svg)](https://www.npmjs.com/package/gwt)
+[![npm version](https://img.shields.io/npm/v/@ikuo-suyama/gwt.svg)](https://www.npmjs.com/package/@ikuo-suyama/gwt)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/node/v/gwt.svg)](https://nodejs.org)
+[![Node.js Version](https://img.shields.io/node/v/@ikuo-suyama/gwt.svg)](https://nodejs.org)
 
 A powerful CLI tool for managing Git worktrees with ease. Simplify your multi-branch workflow with intuitive commands and interactive interfaces.
 
