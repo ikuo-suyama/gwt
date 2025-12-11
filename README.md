@@ -164,7 +164,19 @@ For `gwt switch` to actually change your current directory, you need to add a sh
 
 ### Quick Install (Recommended)
 
-**One command to install** - automatically detects your shell (Fish, Bash, or Zsh):
+**Using gwt command** (easiest - included with gwt):
+
+```bash
+gwt setup
+```
+
+This will:
+- ✅ Automatically detect your shell (Fish, Bash, or Zsh)
+- ✅ Check for existing installations
+- ✅ Prompt to update if an older version is installed
+- ✅ Install or update the shell integration
+
+**Or using one-line remote install**:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ikuo-suyama/gwt/master/shell-integration/install.sh | bash

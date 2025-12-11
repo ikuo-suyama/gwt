@@ -1,5 +1,6 @@
 # gwt - Git Worktree Manager
 # Fish shell integration for directory switching
+# Version: 1.0.0
 
 function gwt
     # For add and switch commands, capture output and cd to the result

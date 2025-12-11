@@ -4,6 +4,9 @@
 
 set -e
 
+# Version of shell integration
+SHELL_INTEGRATION_VERSION="1.0.0"
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -52,36 +55,55 @@ detect_shell() {
     esac
 }
 
-# Check if gwt integration is already installed
-is_already_installed() {
+# Check if gwt integration is already installed and get version
+check_installation() {
     local shell_type=$1
     local config_file=$2
+    local file_to_check=""
 
     case "$shell_type" in
         bash|zsh)
-            if [ -f "$config_file" ]; then
-                if grep -q "# gwt - Git Worktree Manager (shell integration)" "$config_file" 2>/dev/null; then
-                    return 0
-                fi
-            fi
-            return 1
+            file_to_check="$config_file"
             ;;
         fish)
-            # Check both config.fish and conf.d directory
+            # Check conf.d directory first (recommended location)
             if [ -f "$HOME/.config/fish/conf.d/gwt.fish" ]; then
-                return 0
+                file_to_check="$HOME/.config/fish/conf.d/gwt.fish"
+            else
+                file_to_check="$config_file"
             fi
-            if [ -f "$config_file" ]; then
-                if grep -q "# gwt - Git Worktree Manager" "$config_file" 2>/dev/null; then
-                    return 0
-                fi
-            fi
-            return 1
-            ;;
-        *)
-            return 1
             ;;
     esac
+
+    if [ ! -f "$file_to_check" ]; then
+        echo "not_installed"
+        return
+    fi
+
+    # Check for version marker
+    local version=$(grep "# Version:" "$file_to_check" 2>/dev/null | head -1 | sed 's/.*Version: //')
+
+    if [ -n "$version" ]; then
+        echo "$version"
+    elif grep -q "# gwt - Git Worktree Manager" "$file_to_check" 2>/dev/null; then
+        # Old installation without version
+        echo "legacy"
+    else
+        echo "not_installed"
+    fi
+}
+
+# Compare versions (returns 0 if v1 < v2, 1 if v1 >= v2)
+version_less_than() {
+    local v1=$1
+    local v2=$2
+
+    if [ "$v1" = "legacy" ]; then
+        return 0  # legacy is always older
+    fi
+
+    # Simple version comparison (works for semantic versioning)
+    printf '%s\n%s\n' "$v1" "$v2" | sort -V | head -1 | grep -q "^$v1$"
 }
 
 # Download file from GitHub or use local file
@@ -119,15 +141,62 @@ get_integration_file() {
     fi
 }
 
+# Prompt user for confirmation
+prompt_update() {
+    local current_version=$1
+    echo ""
+    warning "A newer version of shell integration is available!"
+    info "Installed version: $current_version"
+    info "Latest version: $SHELL_INTEGRATION_VERSION"
+    echo ""
+    read -p "Would you like to update? (y/N): " -n 1 -r
+    echo ""
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        return 0
+    fi
+    return 1
+}
+
+# Remove old integration from config file
+remove_old_integration() {
+    local config_file=$1
+    local temp_file=$(mktemp)
+
+    # Remove lines between gwt markers
+    awk '
+        /# gwt - Git Worktree Manager/ { skip=1; next }
+        /^function gwt|^gwt\(\)/ { if (skip) { in_func=1; next } }
+        /^}/ { if (in_func) { in_func=0; skip=0; next } }
+        !skip && !in_func { print }
+        /^end$/ { if (in_func) { in_func=0; skip=0; next } }
+    ' "$config_file" > "$temp_file"
+
+    mv "$temp_file" "$config_file"
+}
+
 # Install for Bash
 install_bash() {
     local config_file="$HOME/.bashrc"
 
-    info "Installing gwt shell integration for Bash..."
+    info "Checking Bash shell integration..."
 
-    if is_already_installed "bash" "$config_file"; then
-        warning "gwt shell integration is already installed in $config_file"
-        return 0
+    local current_version=$(check_installation "bash" "$config_file")
+
+    if [ "$current_version" != "not_installed" ]; then
+        if [ "$current_version" = "$SHELL_INTEGRATION_VERSION" ]; then
+            success "Shell integration is already up to date (v$current_version)"
+            return 0
+        fi
+
+        if ! prompt_update "$current_version"; then
+            info "Update cancelled"
+            return 0
+        fi
+
+        info "Updating shell integration..."
+        remove_old_integration "$config_file"
+    else
+        info "Installing gwt shell integration for Bash..."
     fi
 
     local integration_content
@@ -139,7 +208,6 @@ install_bash() {
     fi
 
     echo "" >> "$config_file"
-    echo "# gwt - Git Worktree Manager (shell integration)" >> "$config_file"
     echo "$integration_content" >> "$config_file"
 
     success "Bash integration installed to $config_file"
@@ -150,11 +218,25 @@ install_bash() {
 install_zsh() {
     local config_file="$HOME/.zshrc"
 
-    info "Installing gwt shell integration for Zsh..."
+    info "Checking Zsh shell integration..."
 
-    if is_already_installed "zsh" "$config_file"; then
-        warning "gwt shell integration is already installed in $config_file"
-        return 0
+    local current_version=$(check_installation "zsh" "$config_file")
+
+    if [ "$current_version" != "not_installed" ]; then
+        if [ "$current_version" = "$SHELL_INTEGRATION_VERSION" ]; then
+            success "Shell integration is already up to date (v$current_version)"
+            return 0
+        fi
+
+        if ! prompt_update "$current_version"; then
+            info "Update cancelled"
+            return 0
+        fi
+
+        info "Updating shell integration..."
+        remove_old_integration "$config_file"
+    else
+        info "Installing gwt shell integration for Zsh..."
     fi
 
     local integration_content
@@ -166,7 +248,6 @@ install_zsh() {
     fi
 
     echo "" >> "$config_file"
-    echo "# gwt - Git Worktree Manager (shell integration)" >> "$config_file"
     echo "$integration_content" >> "$config_file"
 
     success "Zsh integration installed to $config_file"
@@ -179,7 +260,7 @@ install_fish() {
     local conf_d_file="$conf_d_dir/gwt.fish"
     local config_file="$HOME/.config/fish/config.fish"
 
-    info "Installing gwt shell integration for Fish..."
+    info "Checking Fish shell integration..."
 
     # Create conf.d directory if it doesn't exist
     if [ ! -d "$conf_d_dir" ]; then
@@ -187,10 +268,24 @@ install_fish() {
         info "Created directory: $conf_d_dir"
     fi
 
-    # Check if already installed
-    if is_already_installed "fish" "$config_file"; then
-        warning "gwt shell integration is already installed in Fish"
-        return 0
+    local current_version=$(check_installation "fish" "$config_file")
+
+    if [ "$current_version" != "not_installed" ]; then
+        if [ "$current_version" = "$SHELL_INTEGRATION_VERSION" ]; then
+            success "Shell integration is already up to date (v$current_version)"
+            return 0
+        fi
+
+        if ! prompt_update "$current_version"; then
+            info "Update cancelled"
+            return 0
+        fi
+
+        info "Updating shell integration..."
+        # Remove old file if exists
+        rm -f "$conf_d_file"
+    else
+        info "Installing gwt shell integration for Fish..."
     fi
 
     local integration_content

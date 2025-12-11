@@ -10,6 +10,7 @@ import { deleteCommand } from './commands/delete.js';
 import { switchCommand } from './commands/switch.js';
 import { pruneCommand } from './commands/prune.js';
 import { syncCommand } from './commands/sync.js';
+import { setupCommand } from './commands/setup.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -76,6 +77,14 @@ program
   .option('--base <branch>', 'Override base branch')
   .action(async (options) => {
     await syncCommand(options);
+  });
+
+// Setup command
+program
+  .command('setup')
+  .description('Install or update shell integration for automatic directory switching')
+  .action(async () => {
+    await setupCommand();
   });
 
 // Show help if no subcommand provided
