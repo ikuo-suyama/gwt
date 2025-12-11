@@ -350,7 +350,7 @@ npm test  # Ensure all tests pass
 
 ## Requirements
 
-- Node.js >= 18.0.0
+- Node.js >= 20.0.0
 - Git >= 2.15.0 (for worktree support)
 
 ## License
