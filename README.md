@@ -162,13 +162,31 @@ git worktree list
 
 For `gwt switch` to actually change your current directory, you need to add a shell function wrapper.
 
+### Quick Install (Recommended)
+
+**One command to install** - automatically detects your shell (Fish, Bash, or Zsh):
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ikuo-suyama/gwt/master/shell-integration/install.sh | bash
+```
+
+Or using wget:
+```bash
+wget -qO- https://raw.githubusercontent.com/ikuo-suyama/gwt/master/shell-integration/install.sh | bash
+```
+
+Then restart your shell:
+```bash
+exec $SHELL -l
+```
+
+### Manual Install
+
 Shell integration scripts are provided in the [`shell-integration/`](shell-integration/) directory:
 
 - **Fish**: [`shell-integration/fish.fish`](shell-integration/fish.fish)
 - **Bash**: [`shell-integration/bash.sh`](shell-integration/bash.sh)
 - **Zsh**: [`shell-integration/zsh.sh`](shell-integration/zsh.sh)
-
-### Quick Install
 
 **Fish (Recommended: use conf.d to keep config.fish clean)**
 ```fish

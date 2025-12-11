@@ -2,7 +2,32 @@
 
 These shell integration scripts enable `gwt switch` to actually change your current directory.
 
-## Installation
+## Quick Installation (Recommended)
+
+**One-line install** - automatically detects your shell and installs the integration:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ikuo-suyama/gwt/master/shell-integration/install.sh | bash
+```
+
+Or using wget:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/ikuo-suyama/gwt/master/shell-integration/install.sh | bash
+```
+
+The installer will:
+- ✅ Automatically detect your shell (Fish, Bash, or Zsh)
+- ✅ Install the appropriate integration
+- ✅ Skip installation if already configured
+- ✅ Provide clear next steps
+
+After installation, restart your shell:
+```bash
+exec $SHELL -l
+```
+
+## Manual Installation
 
 ### Fish Shell
 
