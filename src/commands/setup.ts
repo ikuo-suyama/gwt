@@ -14,8 +14,8 @@ const __dirname = dirname(__filename);
  * This command delegates to the shell-integration/install.sh script which:
  * - Detects the current shell (Fish, Bash, Zsh)
  * - Checks for existing installations
- * - Prompts for updates if needed
- * - Installs or updates the shell integration
+ * - Prompts for overwrite if already installed
+ * - Installs the shell integration
  */
 export async function setupCommand(): Promise<void> {
   try {

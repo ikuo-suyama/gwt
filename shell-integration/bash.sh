@@ -1,6 +1,5 @@
 # gwt - Git Worktree Manager
 # Bash shell integration for directory switching
-# Version: 1.0.0
 
 gwt() {
   # For add and switch commands, capture output and cd to the result
