@@ -1,6 +1,6 @@
 {
   "name": "@ikuo-suyama/gwt",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Git worktree management CLI",
   "type": "module",
   "keywords": [
