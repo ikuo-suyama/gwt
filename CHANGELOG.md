@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.0.1](https://github.com/ikuo-suyama/gwt/compare/v2.0.0...v2.0.1) (2025-12-12)
+
+
+### Bug Fixes
+
+* fetch and pull from origin explicitly in rebaseToBase ([#22](https://github.com/ikuo-suyama/gwt/issues/22)) ([1418fb5](https://github.com/ikuo-suyama/gwt/commit/1418fb552af3ce2a002220e5326104a8dbde9c09))
+* update npm and Node.js version badges to use scoped package name ([#19](https://github.com/ikuo-suyama/gwt/issues/19)) ([e5364b0](https://github.com/ikuo-suyama/gwt/commit/e5364b0e6e0097667499711f08a2ed77d92d58eb))
+
 ## [2.0.0](https://github.com/ikuo-suyama/gwt/compare/v1.2.1...v2.0.0) (2025-12-11)
 
 
