@@ -42,7 +42,7 @@ npx gwt add feature/new-feature
 
 ### Create a New Worktree
 
-Create a worktree for a new or existing branch. With shell integration, you'll be automatically moved to the new worktree:
+Create a worktree for a new or existing branch. By default, new branches start from origin/develop and are automatically rebased to latest. With shell integration, you'll be automatically moved to the new worktree:
 
 ```bash
 # Create worktree with branch name (auto cd to new worktree)
@@ -74,7 +74,6 @@ gwt add feature/auth --from origin/staging
 ```
 
 **Note**:
-- You must use the `add` subcommand explicitly. Running `gwt` without a subcommand shows help.
 - With shell integration installed, `gwt add` automatically changes to the new worktree directory.
 
 ### List Worktrees
