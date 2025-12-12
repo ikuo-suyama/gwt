@@ -14,6 +14,7 @@ vi.mock('simple-git', () => {
     stash: vi.fn(),
     log: vi.fn(),
     show: vi.fn(),
+    fetch: vi.fn(),
   };
 
   return {
@@ -163,7 +164,7 @@ detached
   });
 
   describe('createWorktree', () => {
-    it('should create worktree with new branch', async () => {
+    it('should create worktree with new branch from origin/develop by default', async () => {
       mockGit.revparse.mockResolvedValue('abc123');
       mockGit.raw.mockResolvedValue('');
 
@@ -174,7 +175,35 @@ detached
         '/path/to/new',
         '-b',
         'feature/new',
-        expect.any(String),
+        'origin/develop',
+      ]);
+    });
+
+    it('should create worktree with new branch from custom startPoint', async () => {
+      mockGit.raw.mockResolvedValue('');
+
+      await gitService.createWorktree('/path/to/new', 'feature/new', true, 'origin/main');
+      expect(mockGit.raw).toHaveBeenCalledWith([
+        'worktree',
+        'add',
+        '/path/to/new',
+        '-b',
+        'feature/new',
+        'origin/main',
+      ]);
+    });
+
+    it('should create worktree with new branch from HEAD', async () => {
+      mockGit.raw.mockResolvedValue('');
+
+      await gitService.createWorktree('/path/to/new', 'feature/new', true, 'feature/base');
+      expect(mockGit.raw).toHaveBeenCalledWith([
+        'worktree',
+        'add',
+        '/path/to/new',
+        '-b',
+        'feature/new',
+        'feature/base',
       ]);
     });
 
@@ -257,6 +286,55 @@ detached
 
       const result = await gitService.getLastCommitMessage();
       expect(result).toBe('');
+    });
+  });
+
+  describe('rebaseToBase', () => {
+    it('should rebase directly onto origin branch with fetch', async () => {
+      mockGit.revparse.mockResolvedValueOnce('abc123');
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+      mockGit.fetch.mockResolvedValue(undefined);
+      mockGit.rebase.mockResolvedValue(undefined);
+
+      await gitService.rebaseToBase();
+
+      expect(mockGit.fetch).toHaveBeenCalledWith('origin');
+      expect(mockGit.rebase).toHaveBeenCalledWith(['origin/develop']);
+    });
+
+    it('should stash and pop changes during rebase', async () => {
+      mockGit.revparse.mockResolvedValueOnce('abc123');
+      mockGit.status.mockResolvedValue({ isClean: () => false });
+      mockGit.stash.mockResolvedValue(undefined);
+      mockGit.fetch.mockResolvedValue(undefined);
+      mockGit.rebase.mockResolvedValue(undefined);
+
+      await gitService.rebaseToBase();
+
+      expect(mockGit.stash).toHaveBeenCalledWith(['push', '-m', 'gwt auto-stash before rebase']);
+      expect(mockGit.fetch).toHaveBeenCalledWith('origin');
+      expect(mockGit.rebase).toHaveBeenCalledWith(['origin/develop']);
+      expect(mockGit.stash).toHaveBeenCalledWith(['pop']);
+    });
+
+    it('should use custom base branch if provided', async () => {
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+      mockGit.fetch.mockResolvedValue(undefined);
+      mockGit.rebase.mockResolvedValue(undefined);
+
+      await gitService.rebaseToBase('main');
+
+      expect(mockGit.fetch).toHaveBeenCalledWith('origin');
+      expect(mockGit.rebase).toHaveBeenCalledWith(['origin/main']);
+    });
+
+    it('should throw GitError when rebase fails', async () => {
+      mockGit.revparse.mockResolvedValueOnce('abc123');
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+      mockGit.fetch.mockResolvedValue(undefined);
+      mockGit.rebase.mockRejectedValue(new Error('Rebase conflict'));
+
+      await expect(gitService.rebaseToBase()).rejects.toThrow(GitError);
     });
   });
 });

@@ -28,6 +28,7 @@ program
   .option('--no-env', 'Skip .env file copying')
   .option('--base <branch>', 'Override base branch')
   .option('--path <path>', 'Custom worktree path')
+  .option('--from <branch>', 'Branch to create from (HEAD, branch name, or origin/branch)')
   .action(async (branchName, options) => {
     await addCommand(branchName, options);
   });

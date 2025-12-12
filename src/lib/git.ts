@@ -155,11 +155,17 @@ export class GitService {
   /**
    * Create a new worktree
    */
-  async createWorktree(path: string, branch: string, createNew: boolean): Promise<void> {
+  async createWorktree(
+    path: string,
+    branch: string,
+    createNew: boolean,
+    startPoint?: string
+  ): Promise<void> {
     try {
       if (createNew) {
-        const baseBranch = await this.getBaseBranch();
-        await this.git.raw(['worktree', 'add', path, '-b', branch, baseBranch]);
+        // Use provided startPoint or default to origin/baseBranch
+        const from = startPoint || `origin/${await this.getBaseBranch()}`;
+        await this.git.raw(['worktree', 'add', path, '-b', branch, from]);
       } else {
         await this.git.raw(['worktree', 'add', path, branch]);
       }
@@ -215,7 +221,6 @@ export class GitService {
    */
   async rebaseToBase(baseBranch?: string): Promise<void> {
     try {
-      const currentBranch = await this.getCurrentBranch();
       const targetBase = baseBranch || (await this.getBaseBranch());
 
       // Stash changes if any
@@ -225,13 +230,11 @@ export class GitService {
         await this.git.stash(['push', '-m', 'gwt auto-stash before rebase']);
       }
 
-      // Checkout base branch and pull
-      await this.git.checkout(targetBase);
-      await this.git.pull();
+      // Fetch latest from remote
+      await this.git.fetch('origin');
 
-      // Checkout back to current branch and rebase
-      await this.git.checkout(currentBranch);
-      await this.git.rebase([targetBase]);
+      // Rebase directly onto remote branch (avoids worktree conflicts)
+      await this.git.rebase([`origin/${targetBase}`]);
 
       // Pop stash if we stashed
       if (hasChanges) {

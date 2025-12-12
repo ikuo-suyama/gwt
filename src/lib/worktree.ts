@@ -41,6 +41,7 @@ export class WorktreeManager {
       copyEnv = true,
       baseBranch,
       customPath,
+      from,
     } = options;
 
     // Determine branch name
@@ -58,13 +59,30 @@ export class WorktreeManager {
     // Compute worktree path
     const worktreePath = this.computeWorktreePath(branchName, customPath);
 
+    // Determine the starting point for new branch
+    let startPoint: string | undefined;
+    if (!branchExists && from) {
+      // Resolve --from option
+      if (from === 'HEAD') {
+        startPoint = await this.gitService.getCurrentBranch();
+        logger.info(`Creating new branch from current branch: ${startPoint}`);
+      } else {
+        startPoint = from;
+        logger.info(`Creating new branch from: ${from}`);
+      }
+    } else if (!branchExists) {
+      // Default: create from origin/baseBranch
+      const base = baseBranch || (await this.gitService.getBaseBranch());
+      startPoint = `origin/${base}`;
+      logger.info(`Creating new branch from: ${startPoint}`);
+    }
+
     // Create worktree
     if (branchExists) {
       logger.info(`Using existing branch: ${branchName}`);
-      await this.gitService.createWorktree(worktreePath, branchName, false);
+      await this.gitService.createWorktree(worktreePath, branchName, false, startPoint);
     } else {
-      logger.info(`Creating new branch: ${branchName}`);
-      await this.gitService.createWorktree(worktreePath, branchName, true);
+      await this.gitService.createWorktree(worktreePath, branchName, true, startPoint);
     }
 
     logger.success(`Worktree created: ${worktreePath}`);
@@ -77,15 +95,13 @@ export class WorktreeManager {
     // Perform auto-rebase if enabled
     if (autoRebase) {
       logger.step('Performing auto-rebase...');
-      const currentDir = process.cwd();
       try {
-        process.chdir(worktreePath);
-        await this.gitService.rebaseToBase(baseBranch);
+        // Create new GitService instance for the new worktree
+        const worktreeGitService = new GitService({ cwd: worktreePath });
+        await worktreeGitService.rebaseToBase(baseBranch);
         logger.success('Auto-rebase completed');
       } catch (error) {
         logger.warn('Auto-rebase failed, you may need to rebase manually');
-      } finally {
-        process.chdir(currentDir);
       }
     }
 

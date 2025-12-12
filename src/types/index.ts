@@ -34,6 +34,8 @@ export interface WorktreeOptions {
   baseBranch?: string;
   /** Custom worktree path */
   customPath?: string;
+  /** Branch to create from (default: origin/<baseBranch>) */
+  from?: string;
 }
 
 /**

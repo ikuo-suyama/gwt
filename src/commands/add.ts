@@ -9,6 +9,7 @@ interface AddCommandOptions {
   env?: boolean;
   base?: string;
   path?: string;
+  from?: string;
 }
 
 /**
@@ -30,6 +31,7 @@ export async function addCommand(
       copyEnv: cmdOptions.env !== false, // Default true
       baseBranch: cmdOptions.base,
       customPath: cmdOptions.path,
+      from: cmdOptions.from,
     };
 
     const worktreePath = await worktreeManager.createWorktree(options);
