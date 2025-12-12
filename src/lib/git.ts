@@ -215,7 +215,6 @@ export class GitService {
    */
   async rebaseToBase(baseBranch?: string): Promise<void> {
     try {
-      const currentBranch = await this.getCurrentBranch();
       const targetBase = baseBranch || (await this.getBaseBranch());
 
       // Stash changes if any
@@ -228,13 +227,8 @@ export class GitService {
       // Fetch latest from remote
       await this.git.fetch('origin');
 
-      // Checkout base branch and pull
-      await this.git.checkout(targetBase);
-      await this.git.pull('origin', targetBase);
-
-      // Checkout back to current branch and rebase
-      await this.git.checkout(currentBranch);
-      await this.git.rebase([targetBase]);
+      // Rebase directly onto remote branch (avoids worktree conflicts)
+      await this.git.rebase([`origin/${targetBase}`]);
 
       // Pop stash if we stashed
       if (hasChanges) {
