@@ -63,6 +63,7 @@ describe('WorktreeManager', () => {
       vi.spyOn(mockGitService, 'branchExists').mockResolvedValue(true);
       vi.spyOn(mockGitService, 'createWorktree').mockResolvedValue();
       vi.spyOn(mockGitService, 'rebaseToBase').mockResolvedValue();
+      vi.spyOn(mockGitService, 'getBaseBranch').mockResolvedValue('develop');
     });
 
     it('should create worktree with existing branch', async () => {
@@ -78,7 +79,8 @@ describe('WorktreeManager', () => {
       expect(mockGitService.createWorktree).toHaveBeenCalledWith(
         expect.any(String),
         'feature/test',
-        false
+        false,
+        undefined
       );
     });
 
@@ -95,7 +97,8 @@ describe('WorktreeManager', () => {
       expect(mockGitService.createWorktree).toHaveBeenCalledWith(
         expect.any(String),
         'feature/new',
-        true
+        true,
+        'origin/develop'
       );
     });
 
@@ -111,6 +114,46 @@ describe('WorktreeManager', () => {
       await worktreeManager.createWorktree(options);
       expect(mockGitService.getCurrentBranch).toHaveBeenCalled();
       expect(mockGitService.branchExists).toHaveBeenCalledWith('current-branch');
+    });
+
+    it('should create worktree from HEAD when --from HEAD is specified', async () => {
+      vi.spyOn(mockGitService, 'branchExists').mockResolvedValue(false);
+      vi.spyOn(mockGitService, 'getCurrentBranch').mockResolvedValue('feature/base');
+
+      const options = {
+        branchName: 'feature/new',
+        autoRebase: false,
+        copyEnv: false,
+        from: 'HEAD',
+      };
+
+      await worktreeManager.createWorktree(options);
+      expect(mockGitService.getCurrentBranch).toHaveBeenCalled();
+      expect(mockGitService.createWorktree).toHaveBeenCalledWith(
+        expect.any(String),
+        'feature/new',
+        true,
+        'feature/base'
+      );
+    });
+
+    it('should create worktree from specified branch when --from is specified', async () => {
+      vi.spyOn(mockGitService, 'branchExists').mockResolvedValue(false);
+
+      const options = {
+        branchName: 'feature/new',
+        autoRebase: false,
+        copyEnv: false,
+        from: 'main',
+      };
+
+      await worktreeManager.createWorktree(options);
+      expect(mockGitService.createWorktree).toHaveBeenCalledWith(
+        expect.any(String),
+        'feature/new',
+        true,
+        'main'
+      );
     });
   });
 

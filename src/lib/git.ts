@@ -155,12 +155,17 @@ export class GitService {
   /**
    * Create a new worktree
    */
-  async createWorktree(path: string, branch: string, createNew: boolean): Promise<void> {
+  async createWorktree(
+    path: string,
+    branch: string,
+    createNew: boolean,
+    startPoint?: string
+  ): Promise<void> {
     try {
       if (createNew) {
-        const baseBranch = await this.getBaseBranch();
-        // Create new branch from remote base branch (not local)
-        await this.git.raw(['worktree', 'add', path, '-b', branch, `origin/${baseBranch}`]);
+        // Use provided startPoint or default to origin/baseBranch
+        const from = startPoint || `origin/${await this.getBaseBranch()}`;
+        await this.git.raw(['worktree', 'add', path, '-b', branch, from]);
       } else {
         await this.git.raw(['worktree', 'add', path, branch]);
       }
