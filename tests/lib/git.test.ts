@@ -164,7 +164,7 @@ detached
   });
 
   describe('createWorktree', () => {
-    it('should create worktree with new branch from origin', async () => {
+    it('should create worktree with new branch from origin/develop by default', async () => {
       mockGit.revparse.mockResolvedValue('abc123');
       mockGit.raw.mockResolvedValue('');
 
@@ -175,7 +175,35 @@ detached
         '/path/to/new',
         '-b',
         'feature/new',
-        expect.stringMatching(/^origin\//),
+        'origin/develop',
+      ]);
+    });
+
+    it('should create worktree with new branch from custom startPoint', async () => {
+      mockGit.raw.mockResolvedValue('');
+
+      await gitService.createWorktree('/path/to/new', 'feature/new', true, 'origin/main');
+      expect(mockGit.raw).toHaveBeenCalledWith([
+        'worktree',
+        'add',
+        '/path/to/new',
+        '-b',
+        'feature/new',
+        'origin/main',
+      ]);
+    });
+
+    it('should create worktree with new branch from HEAD', async () => {
+      mockGit.raw.mockResolvedValue('');
+
+      await gitService.createWorktree('/path/to/new', 'feature/new', true, 'feature/base');
+      expect(mockGit.raw).toHaveBeenCalledWith([
+        'worktree',
+        'add',
+        '/path/to/new',
+        '-b',
+        'feature/new',
+        'feature/base',
       ]);
     });
 
