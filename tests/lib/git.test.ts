@@ -14,6 +14,7 @@ vi.mock('simple-git', () => {
     stash: vi.fn(),
     log: vi.fn(),
     show: vi.fn(),
+    fetch: vi.fn(),
   };
 
   return {
@@ -257,6 +258,72 @@ detached
 
       const result = await gitService.getLastCommitMessage();
       expect(result).toBe('');
+    });
+  });
+
+  describe('rebaseToBase', () => {
+    it('should rebase current branch to base branch with fetch and pull', async () => {
+      mockGit.revparse
+        .mockResolvedValueOnce('feature/test\n')
+        .mockResolvedValueOnce('abc123');
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+      mockGit.fetch.mockResolvedValue(undefined);
+      mockGit.checkout.mockResolvedValue(undefined);
+      mockGit.pull.mockResolvedValue(undefined);
+      mockGit.rebase.mockResolvedValue(undefined);
+
+      await gitService.rebaseToBase();
+
+      expect(mockGit.fetch).toHaveBeenCalledWith('origin');
+      expect(mockGit.checkout).toHaveBeenCalledWith('develop');
+      expect(mockGit.pull).toHaveBeenCalledWith('origin', 'develop');
+      expect(mockGit.checkout).toHaveBeenCalledWith('feature/test');
+      expect(mockGit.rebase).toHaveBeenCalledWith(['develop']);
+    });
+
+    it('should stash and pop changes during rebase', async () => {
+      mockGit.revparse
+        .mockResolvedValueOnce('feature/test\n')
+        .mockResolvedValueOnce('abc123');
+      mockGit.status.mockResolvedValue({ isClean: () => false });
+      mockGit.stash.mockResolvedValue(undefined);
+      mockGit.fetch.mockResolvedValue(undefined);
+      mockGit.checkout.mockResolvedValue(undefined);
+      mockGit.pull.mockResolvedValue(undefined);
+      mockGit.rebase.mockResolvedValue(undefined);
+
+      await gitService.rebaseToBase();
+
+      expect(mockGit.stash).toHaveBeenCalledWith(['push', '-m', 'gwt auto-stash before rebase']);
+      expect(mockGit.stash).toHaveBeenCalledWith(['pop']);
+    });
+
+    it('should use custom base branch if provided', async () => {
+      mockGit.revparse.mockResolvedValueOnce('feature/test\n');
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+      mockGit.fetch.mockResolvedValue(undefined);
+      mockGit.checkout.mockResolvedValue(undefined);
+      mockGit.pull.mockResolvedValue(undefined);
+      mockGit.rebase.mockResolvedValue(undefined);
+
+      await gitService.rebaseToBase('main');
+
+      expect(mockGit.fetch).toHaveBeenCalledWith('origin');
+      expect(mockGit.pull).toHaveBeenCalledWith('origin', 'main');
+      expect(mockGit.rebase).toHaveBeenCalledWith(['main']);
+    });
+
+    it('should throw GitError when rebase fails', async () => {
+      mockGit.revparse
+        .mockResolvedValueOnce('feature/test\n')
+        .mockResolvedValueOnce('abc123');
+      mockGit.status.mockResolvedValue({ isClean: () => true });
+      mockGit.fetch.mockResolvedValue(undefined);
+      mockGit.checkout.mockResolvedValue(undefined);
+      mockGit.pull.mockResolvedValue(undefined);
+      mockGit.rebase.mockRejectedValue(new Error('Rebase conflict'));
+
+      await expect(gitService.rebaseToBase()).rejects.toThrow(GitError);
     });
   });
 });

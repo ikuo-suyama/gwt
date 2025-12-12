@@ -225,9 +225,12 @@ export class GitService {
         await this.git.stash(['push', '-m', 'gwt auto-stash before rebase']);
       }
 
+      // Fetch latest from remote
+      await this.git.fetch('origin');
+
       // Checkout base branch and pull
       await this.git.checkout(targetBase);
-      await this.git.pull();
+      await this.git.pull('origin', targetBase);
 
       // Checkout back to current branch and rebase
       await this.git.checkout(currentBranch);
