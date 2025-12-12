@@ -164,7 +164,7 @@ detached
   });
 
   describe('createWorktree', () => {
-    it('should create worktree with new branch', async () => {
+    it('should create worktree with new branch from origin', async () => {
       mockGit.revparse.mockResolvedValue('abc123');
       mockGit.raw.mockResolvedValue('');
 
@@ -175,7 +175,7 @@ detached
         '/path/to/new',
         '-b',
         'feature/new',
-        expect.any(String),
+        expect.stringMatching(/^origin\//),
       ]);
     });
 

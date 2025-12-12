@@ -159,7 +159,8 @@ export class GitService {
     try {
       if (createNew) {
         const baseBranch = await this.getBaseBranch();
-        await this.git.raw(['worktree', 'add', path, '-b', branch, baseBranch]);
+        // Create new branch from remote base branch (not local)
+        await this.git.raw(['worktree', 'add', path, '-b', branch, `origin/${baseBranch}`]);
       } else {
         await this.git.raw(['worktree', 'add', path, branch]);
       }

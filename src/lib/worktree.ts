@@ -77,15 +77,13 @@ export class WorktreeManager {
     // Perform auto-rebase if enabled
     if (autoRebase) {
       logger.step('Performing auto-rebase...');
-      const currentDir = process.cwd();
       try {
-        process.chdir(worktreePath);
-        await this.gitService.rebaseToBase(baseBranch);
+        // Create new GitService instance for the new worktree
+        const worktreeGitService = new GitService({ cwd: worktreePath });
+        await worktreeGitService.rebaseToBase(baseBranch);
         logger.success('Auto-rebase completed');
       } catch (error) {
         logger.warn('Auto-rebase failed, you may need to rebase manually');
-      } finally {
-        process.chdir(currentDir);
       }
     }
 
