@@ -337,4 +337,132 @@ detached
       await expect(gitService.rebaseToBase()).rejects.toThrow(GitError);
     });
   });
+
+  describe('getCommitDate', () => {
+    it('should return commit date for a commit hash', async () => {
+      mockGit.raw.mockResolvedValue('2024-12-14 10:30:45 +0900\n');
+
+      const result = await gitService.getCommitDate('abc1234');
+      expect(result).toBeInstanceOf(Date);
+      expect(result.toISOString()).toBe(new Date('2024-12-14 10:30:45 +0900').toISOString());
+      expect(mockGit.raw).toHaveBeenCalledWith(['show', '-s', '--format=%ci', 'abc1234']);
+    });
+
+    it('should use git -C when worktreePath is provided', async () => {
+      mockGit.raw.mockResolvedValue('2024-12-14 10:30:45 +0900\n');
+
+      await gitService.getCommitDate('abc1234', '/path/to/worktree');
+      expect(mockGit.raw).toHaveBeenCalledWith([
+        '-C',
+        '/path/to/worktree',
+        'show',
+        '-s',
+        '--format=%ci',
+        'abc1234',
+      ]);
+    });
+
+    it('should throw GitError when operation fails', async () => {
+      mockGit.raw.mockRejectedValue(new Error('Git error'));
+
+      await expect(gitService.getCommitDate('abc1234')).rejects.toThrow(GitError);
+    });
+  });
+
+  describe('hasChanges', () => {
+    it('should return true when worktree has changes', async () => {
+      mockGit.raw.mockResolvedValue('M  src/file.ts\n A  src/new.ts\n');
+
+      const result = await gitService.hasChanges('/path/to/worktree');
+      expect(result).toBe(true);
+      expect(mockGit.raw).toHaveBeenCalledWith([
+        '-C',
+        '/path/to/worktree',
+        'status',
+        '--porcelain',
+      ]);
+    });
+
+    it('should return false when worktree is clean', async () => {
+      mockGit.raw.mockResolvedValue('');
+
+      const result = await gitService.hasChanges('/path/to/worktree');
+      expect(result).toBe(false);
+    });
+
+    it('should return false when worktree has only whitespace', async () => {
+      mockGit.raw.mockResolvedValue('   \n  \n');
+
+      const result = await gitService.hasChanges('/path/to/worktree');
+      expect(result).toBe(false);
+    });
+
+    it('should throw GitError when operation fails', async () => {
+      mockGit.raw.mockRejectedValue(new Error('Git error'));
+
+      await expect(gitService.hasChanges('/path/to/worktree')).rejects.toThrow(GitError);
+    });
+  });
+
+  describe('getRemoteSyncStatus', () => {
+    it('should return NO_REMOTE for detached HEAD', async () => {
+      const result = await gitService.getRemoteSyncStatus('HEAD', '/path/to/worktree');
+      expect(result).toBe('no-remote');
+    });
+
+    it('should return NO_REMOTE when remote branch does not exist', async () => {
+      mockGit.revparse.mockRejectedValue(new Error('Not found'));
+
+      const result = await gitService.getRemoteSyncStatus('feature/test', '/path/to/worktree');
+      expect(result).toBe('no-remote');
+    });
+
+    it('should return SYNCED when local and remote are equal', async () => {
+      mockGit.revparse.mockResolvedValue('abc123'); // Remote branch exists
+      mockGit.raw.mockResolvedValue('0\t0\n'); // ahead=0, behind=0
+
+      const result = await gitService.getRemoteSyncStatus('feature/test', '/path/to/worktree');
+      expect(result).toBe('synced');
+      expect(mockGit.raw).toHaveBeenCalledWith([
+        '-C',
+        '/path/to/worktree',
+        'rev-list',
+        '--left-right',
+        '--count',
+        'feature/test...origin/feature/test',
+      ]);
+    });
+
+    it('should return AHEAD when local is ahead of remote', async () => {
+      mockGit.revparse.mockResolvedValue('abc123');
+      mockGit.raw.mockResolvedValue('2\t0\n'); // ahead=2, behind=0
+
+      const result = await gitService.getRemoteSyncStatus('feature/test', '/path/to/worktree');
+      expect(result).toBe('ahead');
+    });
+
+    it('should return BEHIND when local is behind remote', async () => {
+      mockGit.revparse.mockResolvedValue('abc123');
+      mockGit.raw.mockResolvedValue('0\t3\n'); // ahead=0, behind=3
+
+      const result = await gitService.getRemoteSyncStatus('feature/test', '/path/to/worktree');
+      expect(result).toBe('behind');
+    });
+
+    it('should return DIVERGED when local and remote have diverged', async () => {
+      mockGit.revparse.mockResolvedValue('abc123');
+      mockGit.raw.mockResolvedValue('2\t1\n'); // ahead=2, behind=1
+
+      const result = await gitService.getRemoteSyncStatus('feature/test', '/path/to/worktree');
+      expect(result).toBe('diverged');
+    });
+
+    it('should return NO_REMOTE on git operation error', async () => {
+      mockGit.revparse.mockResolvedValue('abc123');
+      mockGit.raw.mockRejectedValue(new Error('Git error'));
+
+      const result = await gitService.getRemoteSyncStatus('feature/test', '/path/to/worktree');
+      expect(result).toBe('no-remote');
+    });
+  });
 });

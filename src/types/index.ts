@@ -1,4 +1,15 @@
 /**
+ * Remote sync status for worktree
+ */
+export enum RemoteSyncStatus {
+  SYNCED = 'synced',
+  AHEAD = 'ahead',
+  BEHIND = 'behind',
+  DIVERGED = 'diverged',
+  NO_REMOTE = 'no-remote',
+}
+
+/**
  * Git worktree information
  */
 export interface WorktreeInfo {
@@ -18,6 +29,14 @@ export interface WorktreeInfo {
   isPrunable: boolean;
   /** Last commit message */
   lastCommitMessage?: string;
+  /** Last commit date */
+  lastCommitDate?: Date;
+  /** Last commit date in relative format (e.g., "2 days ago") */
+  lastCommitDateRelative?: string;
+  /** Whether the worktree has uncommitted changes */
+  hasChanges?: boolean;
+  /** Remote synchronization status */
+  remoteSyncStatus?: RemoteSyncStatus;
 }
 
 /**

@@ -1,5 +1,6 @@
 import simpleGit, { SimpleGit, SimpleGitOptions } from 'simple-git';
 import type { GitConfig, WorktreeInfo } from '../types/index.js';
+import { RemoteSyncStatus } from '../types/index.js';
 import { GitError, BranchNotFoundError, DetachedHeadError } from '../utils/errors.js';
 
 /**
@@ -283,6 +284,93 @@ export class GitService {
       return result.trim();
     } catch {
       return '';
+    }
+  }
+
+  /**
+   * Get commit date for a specific commit
+   * @param commit - Commit hash (short or full)
+   * @param worktreePath - Path to worktree (for git -C option)
+   * @returns Commit date as Date object
+   */
+  async getCommitDate(commit: string, worktreePath?: string): Promise<Date> {
+    try {
+      const args = worktreePath ? ['-C', worktreePath] : [];
+      const result = await this.git.raw([
+        ...args,
+        'show',
+        '-s',
+        '--format=%ci', // ISO 8601 format
+        commit,
+      ]);
+      return new Date(result.trim());
+    } catch (error) {
+      throw new GitError(
+        `Failed to get commit date: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `git show -s --format=%ci ${commit}`
+      );
+    }
+  }
+
+  /**
+   * Check if worktree has uncommitted changes
+   * @param worktreePath - Path to worktree
+   * @returns true if there are staged or unstaged changes
+   */
+  async hasChanges(worktreePath: string): Promise<boolean> {
+    try {
+      // Use git -C to check status in specific worktree
+      const result = await this.git.raw(['-C', worktreePath, 'status', '--porcelain']);
+      return result.trim().length > 0;
+    } catch (error) {
+      throw new GitError(
+        `Failed to check worktree changes: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        `git -C ${worktreePath} status --porcelain`
+      );
+    }
+  }
+
+  /**
+   * Get remote sync status for a branch
+   * @param branch - Branch name
+   * @param worktreePath - Path to worktree
+   * @returns Remote sync status
+   */
+  async getRemoteSyncStatus(branch: string, worktreePath: string): Promise<RemoteSyncStatus> {
+    try {
+      // For detached HEAD, return NO_REMOTE
+      if (branch === 'HEAD') {
+        return RemoteSyncStatus.NO_REMOTE;
+      }
+
+      // Check if remote branch exists
+      const remoteBranch = `origin/${branch}`;
+      const remoteExists = await this.branchExists(remoteBranch);
+
+      if (!remoteExists) {
+        return RemoteSyncStatus.NO_REMOTE;
+      }
+
+      // Compare local and remote using rev-list
+      const result = await this.git.raw([
+        '-C',
+        worktreePath,
+        'rev-list',
+        '--left-right',
+        '--count',
+        `${branch}...${remoteBranch}`,
+      ]);
+
+      // Output format: "<ahead>\t<behind>"
+      const [ahead, behind] = result.trim().split('\t').map(Number);
+
+      if (ahead === 0 && behind === 0) return RemoteSyncStatus.SYNCED;
+      if (ahead > 0 && behind === 0) return RemoteSyncStatus.AHEAD;
+      if (ahead === 0 && behind > 0) return RemoteSyncStatus.BEHIND;
+      return RemoteSyncStatus.DIVERGED;
+    } catch {
+      // If error occurs (e.g., no remote tracking), return NO_REMOTE
+      return RemoteSyncStatus.NO_REMOTE;
     }
   }
 }
