@@ -1,5 +1,12 @@
 # Changelog
 
+## [2.1.0](https://github.com/ikuo-suyama/gwt/compare/v2.0.1...v2.1.0) (2025-12-14)
+
+
+### Features
+
+* enhance ls command with commit dates, status icons, and sorting ([#23](https://github.com/ikuo-suyama/gwt/issues/23)) ([7d87547](https://github.com/ikuo-suyama/gwt/commit/7d87547401171e83b1d8bcbc45e4a60ad7a67e18))
+
 ## [2.0.1](https://github.com/ikuo-suyama/gwt/compare/v2.0.0...v2.0.1) (2025-12-12)
 
 
