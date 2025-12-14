@@ -42,31 +42,31 @@ export async function listCommand(): Promise<void> {
 }
 
 /**
- * Get icon for remote sync status
+ * Get icon for remote sync status (Starship style)
  */
 function getRemoteSyncIcon(status?: RemoteSyncStatus): string {
   if (!status || status === RemoteSyncStatus.NO_REMOTE) return '';
 
   switch (status) {
     case RemoteSyncStatus.SYNCED:
-      return chalk.green('⟳'); // Synced with remote
+      return ''; // No icon for synced (like Starship)
     case RemoteSyncStatus.AHEAD:
-      return chalk.yellow('↑'); // Need to push
+      return '⇡';
     case RemoteSyncStatus.BEHIND:
-      return chalk.blue('↓'); // Need to pull
+      return '⇣';
     case RemoteSyncStatus.DIVERGED:
-      return chalk.red('↕'); // Diverged
+      return '⇕';
     default:
       return '';
   }
 }
 
 /**
- * Get icon for changes status
+ * Get icon for changes status (Starship style)
  */
 function getChangesIcon(hasChanges?: boolean): string {
   if (hasChanges === undefined) return '';
-  return hasChanges ? chalk.yellow('●') : chalk.green('✓');
+  return hasChanges ? '!' : '';
 }
 
 /**
@@ -75,7 +75,14 @@ function getChangesIcon(hasChanges?: boolean): string {
 function displayWorktree(wt: WorktreeInfo): void {
   const icon = wt.isCurrent ? chalk.green('➤') : ' ';
   const path = chalk.cyan(wt.path);
-  const branch = chalk.green(`(${wt.branch})`);
+
+  // Build status string (Starship style)
+  const changesIcon = getChangesIcon(wt.hasChanges);
+  const syncIcon = getRemoteSyncIcon(wt.remoteSyncStatus);
+  const statusString = [changesIcon, syncIcon].filter((s) => s).join('');
+  const statusDisplay = statusString ? chalk.red(` ${statusString}`) : '';
+
+  const branch = chalk.green(`(${wt.branch}${statusDisplay})`);
   const commit = chalk.yellow(`[${wt.commit}]`);
 
   // Status badges
@@ -83,12 +90,7 @@ function displayWorktree(wt: WorktreeInfo): void {
   const main = wt.isMain ? chalk.bgBlue.white(' *main* ') : '';
   const prunable = wt.isPrunable ? chalk.bgRed.white(' *prunable* ') : '';
 
-  // NEW: Status icons
-  const changesIcon = getChangesIcon(wt.hasChanges);
-  const syncIcon = getRemoteSyncIcon(wt.remoteSyncStatus);
-  const statusIcons = [changesIcon, syncIcon].filter((s) => s).join(' ');
-
-  console.error(`${icon} ${path} ${branch} ${commit} ${statusIcons} ${current}${main}${prunable}`);
+  console.error(`${icon} ${path} ${branch} ${commit} ${current}${main}${prunable}`);
 
   // Display commit message with relative time
   if (wt.lastCommitMessage) {

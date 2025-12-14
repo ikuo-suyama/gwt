@@ -223,7 +223,7 @@ describe('listCommand', () => {
       expect(hasRelativeTime).toBe(true);
     });
 
-    it('should display changes icon for clean worktree', async () => {
+    it('should not display icon for clean worktree', async () => {
       const cleanWorktree: WorktreeInfo[] = [
         {
           path: '/path/to/feature',
@@ -243,14 +243,18 @@ describe('listCommand', () => {
       await listCommand();
 
       const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
-      const hasCleanIcon = allCalls.some(
-        (call: unknown) => typeof call === 'string' && call.includes('✓')
+      // Clean worktree should not have '!' in branch name
+      const hasCleanDisplay = allCalls.some(
+        (call: unknown) =>
+          typeof call === 'string' &&
+          call.includes('(feature/test)') &&
+          !call.includes('(feature/test !')
       );
 
-      expect(hasCleanIcon).toBe(true);
+      expect(hasCleanDisplay).toBe(true);
     });
 
-    it('should display changes icon for dirty worktree', async () => {
+    it('should display changes icon for dirty worktree (Starship style)', async () => {
       const dirtyWorktree: WorktreeInfo[] = [
         {
           path: '/path/to/feature',
@@ -270,14 +274,15 @@ describe('listCommand', () => {
       await listCommand();
 
       const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
+      // Dirty worktree should have '!' in branch name
       const hasDirtyIcon = allCalls.some(
-        (call: unknown) => typeof call === 'string' && call.includes('●')
+        (call: unknown) => typeof call === 'string' && call.includes('!')
       );
 
       expect(hasDirtyIcon).toBe(true);
     });
 
-    it('should display remote sync icons', async () => {
+    it('should display remote sync icons (Starship style)', async () => {
       const worktreesWithRemoteStatus: WorktreeInfo[] = [
         {
           path: '/path/to/synced',
@@ -327,24 +332,58 @@ describe('listCommand', () => {
 
       const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
 
-      // Check for sync icons
-      const hasSyncedIcon = allCalls.some(
-        (call: unknown) => typeof call === 'string' && call.includes('⟳')
+      // Check for Starship-style sync icons
+      // Synced should not display any icon
+      const hasSyncedClean = allCalls.some(
+        (call: unknown) =>
+          typeof call === 'string' &&
+          call.includes('(feature/synced)') &&
+          !call.includes('⇡') &&
+          !call.includes('⇣') &&
+          !call.includes('⇕')
       );
       const hasAheadIcon = allCalls.some(
-        (call: unknown) => typeof call === 'string' && call.includes('↑')
+        (call: unknown) => typeof call === 'string' && call.includes('⇡')
       );
       const hasBehindIcon = allCalls.some(
-        (call: unknown) => typeof call === 'string' && call.includes('↓')
+        (call: unknown) => typeof call === 'string' && call.includes('⇣')
       );
       const hasDivergedIcon = allCalls.some(
-        (call: unknown) => typeof call === 'string' && call.includes('↕')
+        (call: unknown) => typeof call === 'string' && call.includes('⇕')
       );
 
-      expect(hasSyncedIcon).toBe(true);
+      expect(hasSyncedClean).toBe(true);
       expect(hasAheadIcon).toBe(true);
       expect(hasBehindIcon).toBe(true);
       expect(hasDivergedIcon).toBe(true);
+    });
+
+    it('should combine changes and sync status icons', async () => {
+      const combinedStatusWorktree: WorktreeInfo[] = [
+        {
+          path: '/path/to/feature',
+          branch: 'feature/test',
+          commit: 'abc1234',
+          isMain: false,
+          isCurrent: false,
+          isDetached: false,
+          isPrunable: false,
+          hasChanges: true,
+          remoteSyncStatus: 'behind' as const,
+        },
+      ];
+
+      mockWorktreeManager.listWorktrees.mockResolvedValue(combinedStatusWorktree);
+
+      await listCommand();
+
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
+      // Should display both ! and ⇣
+      const hasCombinedStatus = allCalls.some(
+        (call: unknown) => typeof call === 'string' && call.includes('!⇣')
+      );
+
+      expect(hasCombinedStatus).toBe(true);
     });
   });
 
