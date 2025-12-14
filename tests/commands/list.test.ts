@@ -34,6 +34,10 @@ describe('listCommand', () => {
       isDetached: false,
       isPrunable: false,
       lastCommitMessage: 'Initial commit',
+      lastCommitDate: new Date('2024-12-14T10:00:00Z'),
+      lastCommitDateRelative: '2 hours ago',
+      hasChanges: false,
+      remoteSyncStatus: 'no-remote' as const,
     },
     {
       path: '/path/to/feature',
@@ -44,6 +48,10 @@ describe('listCommand', () => {
       isDetached: false,
       isPrunable: false,
       lastCommitMessage: 'Add new feature',
+      lastCommitDate: new Date('2024-12-10T10:00:00Z'),
+      lastCommitDateRelative: '3 days ago',
+      hasChanges: true,
+      remoteSyncStatus: 'ahead' as const,
     },
     {
       path: '/path/to/prunable',
@@ -54,6 +62,10 @@ describe('listCommand', () => {
       isDetached: false,
       isPrunable: true,
       lastCommitMessage: 'Old feature',
+      lastCommitDate: new Date('2024-11-01T10:00:00Z'),
+      lastCommitDateRelative: '6 weeks ago',
+      hasChanges: false,
+      remoteSyncStatus: 'synced' as const,
     },
   ];
 
@@ -192,6 +204,147 @@ describe('listCommand', () => {
       await listCommand();
 
       expect(logger.highlight).toHaveBeenCalledWith('Git Worktrees');
+    });
+
+    it('should display relative time with commit message', async () => {
+      mockWorktreeManager.listWorktrees.mockResolvedValue(mockWorktrees);
+
+      await listCommand();
+
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
+      const hasRelativeTime = allCalls.some(
+        (call: unknown) =>
+          typeof call === 'string' &&
+          (call.includes('2 hours ago') ||
+            call.includes('3 days ago') ||
+            call.includes('6 weeks ago'))
+      );
+
+      expect(hasRelativeTime).toBe(true);
+    });
+
+    it('should display changes icon for clean worktree', async () => {
+      const cleanWorktree: WorktreeInfo[] = [
+        {
+          path: '/path/to/feature',
+          branch: 'feature/test',
+          commit: 'abc1234',
+          isMain: false,
+          isCurrent: false,
+          isDetached: false,
+          isPrunable: false,
+          lastCommitMessage: 'Test commit',
+          hasChanges: false,
+        },
+      ];
+
+      mockWorktreeManager.listWorktrees.mockResolvedValue(cleanWorktree);
+
+      await listCommand();
+
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
+      const hasCleanIcon = allCalls.some(
+        (call: unknown) => typeof call === 'string' && call.includes('✓')
+      );
+
+      expect(hasCleanIcon).toBe(true);
+    });
+
+    it('should display changes icon for dirty worktree', async () => {
+      const dirtyWorktree: WorktreeInfo[] = [
+        {
+          path: '/path/to/feature',
+          branch: 'feature/test',
+          commit: 'abc1234',
+          isMain: false,
+          isCurrent: false,
+          isDetached: false,
+          isPrunable: false,
+          lastCommitMessage: 'Test commit',
+          hasChanges: true,
+        },
+      ];
+
+      mockWorktreeManager.listWorktrees.mockResolvedValue(dirtyWorktree);
+
+      await listCommand();
+
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
+      const hasDirtyIcon = allCalls.some(
+        (call: unknown) => typeof call === 'string' && call.includes('●')
+      );
+
+      expect(hasDirtyIcon).toBe(true);
+    });
+
+    it('should display remote sync icons', async () => {
+      const worktreesWithRemoteStatus: WorktreeInfo[] = [
+        {
+          path: '/path/to/synced',
+          branch: 'feature/synced',
+          commit: 'abc1234',
+          isMain: false,
+          isCurrent: false,
+          isDetached: false,
+          isPrunable: false,
+          remoteSyncStatus: 'synced' as const,
+        },
+        {
+          path: '/path/to/ahead',
+          branch: 'feature/ahead',
+          commit: 'def5678',
+          isMain: false,
+          isCurrent: false,
+          isDetached: false,
+          isPrunable: false,
+          remoteSyncStatus: 'ahead' as const,
+        },
+        {
+          path: '/path/to/behind',
+          branch: 'feature/behind',
+          commit: 'ghi9012',
+          isMain: false,
+          isCurrent: false,
+          isDetached: false,
+          isPrunable: false,
+          remoteSyncStatus: 'behind' as const,
+        },
+        {
+          path: '/path/to/diverged',
+          branch: 'feature/diverged',
+          commit: 'jkl3456',
+          isMain: false,
+          isCurrent: false,
+          isDetached: false,
+          isPrunable: false,
+          remoteSyncStatus: 'diverged' as const,
+        },
+      ];
+
+      mockWorktreeManager.listWorktrees.mockResolvedValue(worktreesWithRemoteStatus);
+
+      await listCommand();
+
+      const allCalls = consoleErrorSpy.mock.calls.map((call: any[]) => call[0]);
+
+      // Check for sync icons
+      const hasSyncedIcon = allCalls.some(
+        (call: unknown) => typeof call === 'string' && call.includes('⟳')
+      );
+      const hasAheadIcon = allCalls.some(
+        (call: unknown) => typeof call === 'string' && call.includes('↑')
+      );
+      const hasBehindIcon = allCalls.some(
+        (call: unknown) => typeof call === 'string' && call.includes('↓')
+      );
+      const hasDivergedIcon = allCalls.some(
+        (call: unknown) => typeof call === 'string' && call.includes('↕')
+      );
+
+      expect(hasSyncedIcon).toBe(true);
+      expect(hasAheadIcon).toBe(true);
+      expect(hasBehindIcon).toBe(true);
+      expect(hasDivergedIcon).toBe(true);
     });
   });
 

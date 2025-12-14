@@ -1,8 +1,10 @@
 import path from 'path';
 import type { WorktreeOptions } from '../types/index.js';
+import { RemoteSyncStatus } from '../types/index.js';
 import { GitService } from './git.js';
 import { WorktreeError } from '../utils/errors.js';
 import { logger } from '../utils/logger.js';
+import { formatRelativeTime } from '../utils/date.js';
 
 /**
  * Worktree management service
@@ -158,10 +160,42 @@ export class WorktreeManager {
   async listWorktrees() {
     const worktrees = await this.gitService.listWorktrees();
 
-    // Enhance with commit messages
-    for (const wt of worktrees) {
-      wt.lastCommitMessage = await this.gitService.getLastCommitMessage(wt.commit);
-    }
+    // Enhance with all new information in parallel
+    await Promise.all(
+      worktrees.map(async (wt) => {
+        // Existing: commit message
+        wt.lastCommitMessage = await this.gitService.getLastCommitMessage(wt.commit);
+
+        // NEW: commit date and relative time
+        try {
+          wt.lastCommitDate = await this.gitService.getCommitDate(wt.commit, wt.path);
+          wt.lastCommitDateRelative = formatRelativeTime(wt.lastCommitDate);
+        } catch {
+          // Graceful fallback
+          wt.lastCommitDateRelative = 'unknown';
+        }
+
+        // NEW: changes status
+        try {
+          wt.hasChanges = await this.gitService.hasChanges(wt.path);
+        } catch {
+          wt.hasChanges = false;
+        }
+
+        // NEW: remote sync status (only for non-main branches)
+        if (!wt.isMain && !wt.isDetached) {
+          wt.remoteSyncStatus = await this.gitService.getRemoteSyncStatus(wt.branch, wt.path);
+        } else {
+          wt.remoteSyncStatus = RemoteSyncStatus.NO_REMOTE;
+        }
+      })
+    );
+
+    // NEW: Sort by last commit date (most recent first)
+    worktrees.sort((a, b) => {
+      if (!a.lastCommitDate || !b.lastCommitDate) return 0;
+      return b.lastCommitDate.getTime() - a.lastCommitDate.getTime();
+    });
 
     return worktrees;
   }
