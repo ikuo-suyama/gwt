@@ -23,20 +23,53 @@ A powerful CLI tool for managing Git worktrees with ease. Simplify your multi-br
 ### Global Installation
 
 ```bash
-npm install -g gwt
+npm install -g @ikuo-suyama/gwt
 ```
 
 ### Local Installation
 
 ```bash
-npm install gwt
+npm install @ikuo-suyama/gwt
 ```
 
 ### Using npx (No Installation Required)
 
 ```bash
-npx gwt add feature/new-feature
+npx @ikuo-suyama/gwt add feature/new-feature
 ```
+
+## Shell Integration (Recommended)
+
+For `gwt add` and `gwt switch` to automatically change your current directory, set up shell integration first:
+
+```bash
+gwt setup
+```
+
+This will automatically detect your shell (Fish, Bash, or Zsh) and install the integration. Then restart your shell:
+
+```bash
+exec $SHELL -l
+```
+
+<details>
+<summary>Other installation methods</summary>
+
+**One-line remote install**:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/ikuo-suyama/gwt/master/shell-integration/install.sh | bash
+```
+
+**Manual install** - scripts are in the [`shell-integration/`](shell-integration/) directory:
+
+- **Fish**: `cp shell-integration/fish.fish ~/.config/fish/conf.d/gwt.fish`
+- **Bash**: `echo "source $(pwd)/shell-integration/bash.sh" >> ~/.bashrc`
+- **Zsh**: `echo "source $(pwd)/shell-integration/zsh.sh" >> ~/.zshrc`
+
+See [`shell-integration/README.md`](shell-integration/README.md) for details.
+
+</details>
 
 ## Usage
 
@@ -165,69 +198,6 @@ gwt prune
 git worktree list
 # → Only remaining worktrees
 ```
-
-## Shell Integration
-
-For `gwt switch` to actually change your current directory, you need to add a shell function wrapper.
-
-### Quick Install (Recommended)
-
-**Using gwt command** (easiest - included with gwt):
-
-```bash
-gwt setup
-```
-
-This will:
-- ✅ Automatically detect your shell (Fish, Bash, or Zsh)
-- ✅ Check for existing installations
-- ✅ Prompt to update if an older version is installed
-- ✅ Install or update the shell integration
-
-**Or using one-line remote install**:
-
-```bash
-curl -fsSL https://raw.githubusercontent.com/ikuo-suyama/gwt/master/shell-integration/install.sh | bash
-```
-
-Or using wget:
-```bash
-wget -qO- https://raw.githubusercontent.com/ikuo-suyama/gwt/master/shell-integration/install.sh | bash
-```
-
-Then restart your shell:
-```bash
-exec $SHELL -l
-```
-
-### Manual Install
-
-Shell integration scripts are provided in the [`shell-integration/`](shell-integration/) directory:
-
-- **Fish**: [`shell-integration/fish.fish`](shell-integration/fish.fish)
-- **Bash**: [`shell-integration/bash.sh`](shell-integration/bash.sh)
-- **Zsh**: [`shell-integration/zsh.sh`](shell-integration/zsh.sh)
-
-**Fish (Recommended: use conf.d to keep config.fish clean)**
-```fish
-# Copy to conf.d directory (auto-loaded by Fish)
-cp shell-integration/fish.fish ~/.config/fish/conf.d/gwt.fish
-exec $SHELL -l
-```
-
-**Bash**
-```bash
-echo "source $(pwd)/shell-integration/bash.sh" >> ~/.bashrc
-exec $SHELL -l
-```
-
-**Zsh**
-```zsh
-echo "source $(pwd)/shell-integration/zsh.sh" >> ~/.zshrc
-exec $SHELL -l
-```
-
-See [`shell-integration/README.md`](shell-integration/README.md) for more details.
 
 ## How It Works
 
